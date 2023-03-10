@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>0.0.1-alpha.1</Version>
+    <FileVersion>0.0.1.0</FileVersion>
+    <AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <Authors>Uwe Riegel</Authors>
+    <Company>Uwe Riegel</Company>		
+    <Description>Tools for Asp.NET, mostly functional extensions, SSE, Range (via Giraffe)</Description>
+    <PackageTags>CSharp;C#;.NET;Asp.NET;Functional</PackageTags>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/uriegel/AspNetExtensions</PackageProjectUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>		    
+    <LangVersion>10</LangVersion>
+    <NoWarn>CS1591</NoWarn>    
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="giraffe" Version="6.0.0" />
+    <PackageReference Include="LinqTools" Version="0.0.1-alpha.5" />
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>
