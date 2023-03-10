@@ -55,4 +55,5 @@ WebApplication
     .Run();
 
 record RendererEvent(string Theme);
-// TODO Events with inheritance
+// TODO Inject new Sse
+
