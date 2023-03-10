@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AspNetExtensions;
 
@@ -37,9 +38,19 @@ public static class Extensions
     public static WebApplication WithEndpoints(this WebApplication app, Action<IEndpointRouteBuilder> configure)
         => app.SideEffect(a => a.UseEndpoints(configure));
 
+    public static WebApplication When(this WebApplication webApp, bool when, Func<WebApplication, WebApplication> handler)
+        => when
+            ? handler(webApp)
+            : webApp;
+
     public static Task StreamRangeFile(this HttpContext context, string filePath)
         => context.WriteFileStreamAsync(true, filePath, Microsoft.FSharp.Core.FSharpOption<Microsoft.Net.Http.Headers.EntityTagHeaderValue>.None,
         Microsoft.FSharp.Core.FSharpOption<DateTimeOffset>.None);
+
+    public static IServiceCollection When(this IServiceCollection services, bool when, Func<IServiceCollection, IServiceCollection> handler)
+        => when
+            ? handler(services)
+            : services;
 
     public static string? GetEnvironmentVariable(this string key)
         => ExceptionToNull(() => Environment.GetEnvironmentVariable(key) ?? throw new Exception());

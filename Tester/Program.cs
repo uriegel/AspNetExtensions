@@ -15,7 +15,7 @@ WebApplication
             .ConfigureKestrel(options => options.ListenAnyIP(19999))
             .ConfigureServices(services =>
                 services
-                    .AddCors()
+                    .When(true, s => s.AddCors())
                     .AddResponseCompression())
             .ConfigureLogging(builder =>
                 builder
@@ -46,11 +46,11 @@ WebApplication
             var name = context.Request.RouteValues["name"];
             await context.Response.WriteAsJsonAsync(new { Message = $"Hello {name}", Mist = (string?)null }, JsonWebDefaults);
         })
-    .WithCors(builder =>
+    .When(true, app => app.WithCors(builder =>
         builder
             .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
-            .AllowAnyMethod())
+            .AllowAnyMethod()))
     .WithRouting()
     .Run();
 
