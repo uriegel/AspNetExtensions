@@ -1,7 +1,5 @@
 ﻿
 using AspNetExtensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 
 using static AspNetExtensions.Core;
 
