@@ -67,5 +67,10 @@ void StartEvents(Action<Event> onChanged)
 
 record Event(string Theme);
 
-// TODO Rest interface with Get/Post
+// TODO index.html
+// TODO script.css
+// TODO sse events to console
+// TODO Rest interface with Post (JSON -> JSON)
+// TODO buttons to test rest interface
 // TODO SendFiles (ContentType, lastModified)
+// TODO GetMimeType
