@@ -27,6 +27,8 @@ public static class Extensions
     public static WebApplication WithMapGet(this WebApplication app, string pattern, Delegate handler)
         => app.SideEffect(a => a.MapGet(pattern, handler));
 
+    public static WebApplication WithMapPost(this WebApplication app, string pattern, RequestDelegate requestDelegate)
+        => app.SideEffect(a => a.MapPost(pattern, requestDelegate));
     public static WebApplication WithResponseCompression(this WebApplication app)
         => app.SideEffect(a => a.UseResponseCompression());
 
@@ -83,6 +85,13 @@ public static class Extensions
         => when
             ? handler(services)
             : services;
+
+    public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<T, Task<TResult>> onJson)
+        => webApp.WithMapPost(path, async context => 
+        {
+            var param = await context.Request.ReadFromJsonAsync<T>();
+            await context.Response.WriteAsJsonAsync<TResult>(await onJson(param!));
+        });
 }
 
 

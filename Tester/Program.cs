@@ -1,4 +1,5 @@
 ﻿using AspNetExtensions;
+using LinqTools;
 using static AspNetExtensions.Core;
 
 var sseEventSource = SseEventSource<Event>.Create();
@@ -47,9 +48,13 @@ WebApplication
             .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()))
+    .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest1)
     .WithRouting()
     .WithFileServer("", "webroot")
     .Run();
+
+Task<Cmd1Result> JsonRequest1(Cmd1Param param)
+    => new Cmd1Result("Result", 3).ToAsync(); 
 
 void StartEvents(Action<Event> onChanged)   
 {
@@ -66,9 +71,9 @@ void StartEvents(Action<Event> onChanged)
 
 record Event(string Content);
 
-// TODO Rest interface with Post (JSON -> JSON)
-// TODO buttons to test rest interface
-// TODO Delete Kestrel project
+record Cmd1Param(string Text, int Id);
+record Cmd1Result(string Result, int Id);
+
 // TODO GetMimeType
 // string GetMimeTypeForFileExtension(string filePath)
 // {
