@@ -1,7 +1,4 @@
-﻿
-using System.Diagnostics;
-using AspNetExtensions;
-
+﻿using AspNetExtensions;
 using static AspNetExtensions.Core;
 
 var sseEventSource = SseEventSource<Event>.Create();
@@ -33,30 +30,25 @@ WebApplication
     //     await next(context);
     // })
     .WithMapGet("/test", () => "Das ist der Test")
-    .WithMapGet("/filmseite", context =>
+    .WithMapGet("/cinema", context =>
         {
             context.Response.Headers.ContentType = "text/html";
             return context.Response.WriteAsync(VideoPage.Value);
         })
-    .WithMapGet("/film", context => context.StreamRangeFile("/home/uwe/Videos/Buster Keaton - Der Navigator.mp4"))
+    .WithMapGet("/video", context => context.StreamRangeFile("/home/uwe/Videos/Buster Keaton - Der Navigator.mp4"))
     .WithMapGet("/json/{name:alpha}", async context =>
         {
             var name = context.Request.RouteValues["name"];
             await context.Response.WriteAsJsonAsync(new { Message = $"Hello {name}", Mist = (string?)null }, JsonWebDefaults);
         })
-    .WithSse("/commander/sse", sseEventSource)
+    .WithSse("/sse/test", sseEventSource)
     .When(true, app => app.WithCors(builder =>
         builder
             .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()))
     .WithRouting()
-    .WithMapSubPath("", async (context, subPath) =>
-    {
-        await context.Response.StartAsync();
-        // TODO WhitespaceToNull GetOrDefault(index.html)
-        await File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "webroot", subPath.Length > 0 ? subPath : "index.html")).CopyToAsync(context.Response.Body);
-    })
+    .WithFileServer("", "webroot")
     .Run();
 
 void StartEvents(Action<Event> onChanged)   
@@ -72,12 +64,22 @@ void StartEvents(Action<Event> onChanged)
         }).Start();   
 }
 
-record Event(string Theme);
+record Event(string Content);
 
-// TODO GetMimeType
-// TODO script.css
-// TODO sse events to console
 // TODO Rest interface with Post (JSON -> JSON)
 // TODO buttons to test rest interface
-// TODO SendFiles (ContentType, lastModified)
 // TODO Delete Kestrel project
+// TODO GetMimeType
+// string GetMimeTypeForFileExtension(string filePath)
+// {
+//     const string DefaultContentType = "application/octet-stream";
+
+//     var provider = new FileExtensionContentTypeProvider();
+
+//     if (!provider.TryGetContentType(filePath, out var contentType))
+//     {
+//         contentType = DefaultContentType;
+//     }
+
+//     return contentType;
+// }

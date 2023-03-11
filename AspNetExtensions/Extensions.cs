@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 
 namespace AspNetExtensions;
 
@@ -38,6 +39,20 @@ public static class Extensions
     public static WebApplication WithEndpoints(this WebApplication app, Action<IEndpointRouteBuilder> configure)
         => app.SideEffect(a => a.UseEndpoints(configure));
 
+    public static WebApplication WithStaticFiles(this WebApplication app, string requestUrl, string path)
+        => app.SideEffect(a => a.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), path)),
+            RequestPath = requestUrl
+        }));
+
+    public static WebApplication WithFileServer(this WebApplication app, string requestUrl, string path)
+        => app.SideEffect(a => a.UseFileServer(new FileServerOptions
+        {
+            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), path)),
+            RequestPath = requestUrl,
+        }));
+
     public static WebApplication When(this WebApplication webApp, bool when, Func<WebApplication, WebApplication> handler)
         => when
             ? handler(webApp)
@@ -48,7 +63,7 @@ public static class Extensions
         {
             if (context.Request.Path.ToString().StartsWith(path))
             {
-                await handler(context, context.Request.Path.ToString()[(path.Length+1)..]);
+                await handler(context, context.Request.Path.ToString()[(path.Length + 1)..]);
                 return;
             }
             await next(context);
@@ -68,8 +83,6 @@ public static class Extensions
         => when
             ? handler(services)
             : services;
-
-    public static string? GetEnvironmentVariable(this string key)
-        => ExceptionToNull(() => Environment.GetEnvironmentVariable(key) ?? throw new Exception());
 }
+
 
