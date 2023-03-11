@@ -74,3 +74,4 @@ record Event(string Theme);
 // TODO buttons to test rest interface
 // TODO SendFiles (ContentType, lastModified)
 // TODO GetMimeType
+// TODO Delete Kestrel project
