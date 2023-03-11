@@ -54,6 +54,12 @@ public static class Extensions
             await next(context);
         });
 
+    public static WebApplication WithSse<TEvent>(this WebApplication webApp, string path, SseEventSource<TEvent> sseEventSource)
+        => webApp.WithMapGet(path, context => new Sse<TEvent>(sseEventSource.Subject).Start(context));
+
+    public static WebApplication WithSse<TEvent>(this WebApplication webApp, string path, IObservable<TEvent> onNext)
+        => webApp.WithMapGet(path, context => new Sse<TEvent>(onNext).Start(context));
+
     public static Task StreamRangeFile(this HttpContext context, string filePath)
         => context.WriteFileStreamAsync(true, filePath, Microsoft.FSharp.Core.FSharpOption<Microsoft.Net.Http.Headers.EntityTagHeaderValue>.None,
         Microsoft.FSharp.Core.FSharpOption<DateTimeOffset>.None);

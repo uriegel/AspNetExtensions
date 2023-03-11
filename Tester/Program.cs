@@ -3,8 +3,8 @@ using AspNetExtensions;
 
 using static AspNetExtensions.Core;
 
-var sse = new Sse<RendererEvent>();
-// Theme.StartThemeDetection(sse.SetTheme);
+var sseEventSource = SseEventSource<Event>.Create();
+StartEvents(sseEventSource.Send);
 
 WebApplication
     .CreateBuilder(args)
@@ -38,12 +38,12 @@ WebApplication
             return context.Response.WriteAsync(VideoPage.Value);
         })
     .WithMapGet("/film", context => context.StreamRangeFile("/home/uwe/Videos/Buster Keaton - Der Navigator.mp4"))
-    .WithMapGet("/commander/sse", h => sse.Start(h))
     .WithMapGet("/json/{name:alpha}", async context =>
         {
             var name = context.Request.RouteValues["name"];
             await context.Response.WriteAsJsonAsync(new { Message = $"Hello {name}", Mist = (string?)null }, JsonWebDefaults);
         })
+    .WithSse("/commander/sse", sseEventSource)
     .When(true, app => app.WithCors(builder =>
         builder
             .WithOrigins("http://localhost:3000")
@@ -52,6 +52,19 @@ WebApplication
     .WithRouting()
     .Run();
 
-record RendererEvent(string Theme);
-// TODO Inject new Sse
+void StartEvents(Action<Event> onChanged)   
+{
+    var counter = 0;
+    new Thread(_ =>
+        {
+            while (true)
+            {
+                Thread.Sleep(5000);
+                onChanged(new($"Ein Event {counter++}"));
+           }
+        }).Start();   
+}
 
+record Event(string Theme);
+
+// TODO Rest interface with Get/Post

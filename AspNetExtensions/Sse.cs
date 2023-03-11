@@ -5,18 +5,18 @@ using static AspNetExtensions.Core;
 
 namespace AspNetExtensions;
 
-public class Sse<TEvent>
+class Sse<TEvent>
 {
-    public static void SendEvent(TEvent evt) 
-        => subject.OnNext(evt);
+    internal Sse(IObservable<TEvent> onNext)
+        => this.onNext = onNext;
 
-    public static async Task Start(HttpContext context)
+    internal async Task Start(HttpContext context)
     {
         context.Response.StatusCode = 200;
         context.Response.Headers.ContentType = "text/event-stream";
         context.Response.Headers.CacheControl = "no-cache";
 
-        subject.Subscribe(async n =>
+        onNext.Subscribe(async n =>
         {
             var payload = System.Text.Json.JsonSerializer.Serialize(n, JsonWebDefaults);
             await context.Response.WriteAsync($"data:{payload}\n\n");
@@ -27,6 +27,7 @@ public class Sse<TEvent>
         await tcs.Task;
     }
 
-    static Subject<TEvent> subject = new();
+    IObservable<TEvent> onNext;
 }
 
+ 
