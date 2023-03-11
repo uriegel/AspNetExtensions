@@ -68,3 +68,4 @@ void StartEvents(Action<Event> onChanged)
 record Event(string Theme);
 
 // TODO Rest interface with Get/Post
+// TODO SendFiles (ContentType, lastModified)
