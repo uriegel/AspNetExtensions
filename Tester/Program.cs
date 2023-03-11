@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics;
 using AspNetExtensions;
 
 using static AspNetExtensions.Core;
@@ -22,15 +23,15 @@ WebApplication
                     .AddDebug()))
     .Build()
     .WithResponseCompression()
-    .With(async (context, next) =>
-    {
-        if (context.Request.Path == "/")
-        {
-            await context.Response.WriteAsync("Terminal Middleware.");
-            return;
-        }
-        await next(context);
-    })
+    // .With(async (context, next) =>
+    // {
+    //     if (context.Request.Path == "/")
+    //     {
+    //         await context.Response.WriteAsync("Terminal Middleware.");
+    //         return;
+    //     }
+    //     await next(context);
+    // })
     .WithMapGet("/test", () => "Das ist der Test")
     .WithMapGet("/filmseite", context =>
         {
@@ -50,6 +51,12 @@ WebApplication
             .AllowAnyHeader()
             .AllowAnyMethod()))
     .WithRouting()
+    .WithMapSubPath("", async (context, subPath) =>
+    {
+        await context.Response.StartAsync();
+        // TODO WhitespaceToNull GetOrDefault(index.html)
+        await File.OpenRead(Path.Combine(Directory.GetCurrentDirectory(), "webroot", subPath.Length > 0 ? subPath : "index.html")).CopyToAsync(context.Response.Body);
+    })
     .Run();
 
 void StartEvents(Action<Event> onChanged)   
@@ -67,11 +74,10 @@ void StartEvents(Action<Event> onChanged)
 
 record Event(string Theme);
 
-// TODO index.html
+// TODO GetMimeType
 // TODO script.css
 // TODO sse events to console
 // TODO Rest interface with Post (JSON -> JSON)
 // TODO buttons to test rest interface
 // TODO SendFiles (ContentType, lastModified)
-// TODO GetMimeType
 // TODO Delete Kestrel project
