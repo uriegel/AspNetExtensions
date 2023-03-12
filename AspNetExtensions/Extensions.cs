@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using static Giraffe.Streaming.StreamingExtensions;
 using LinqTools;
 
-using static LinqTools.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -92,6 +91,14 @@ public static class Extensions
             var param = await context.Request.ReadFromJsonAsync<T>();
             await context.Response.WriteAsJsonAsync<TResult>(await onJson(param!));
         });
+
+    public static WebApplication With(this WebApplication webApp, IEnumerable<Func<WebApplication, WebApplication>> handlers)
+    {
+        var result = webApp;
+        foreach (var handler in handlers)
+            result = handler(result);
+        return result;
+    }
 }
 
 

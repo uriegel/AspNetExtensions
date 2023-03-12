@@ -8,5 +8,5 @@ public class SseEventSource<TEvent>
         => new ();
     public void Send(TEvent evt) => Subject.OnNext(evt);
 
-    internal Subject<TEvent> Subject { get; private set; } = new();
+    public Subject<TEvent> Subject { get; private set; } = new();
 }

@@ -5,12 +5,12 @@ using static AspNetExtensions.Core;
 
 namespace AspNetExtensions;
 
-class Sse<TEvent>
+public class Sse<TEvent>
 {
-    internal Sse(IObservable<TEvent> onNext)
+    public Sse(IObservable<TEvent> onNext)
         => this.onNext = onNext;
 
-    internal async Task Start(HttpContext context)
+    public async Task Start(HttpContext context)
     {
         context.Response.StatusCode = 200;
         context.Response.Headers.ContentType = "text/event-stream";
