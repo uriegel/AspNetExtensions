@@ -41,17 +41,10 @@ WebApplication
     .WithMapGet("/video", context => context.StreamRangeFile("/home/uwe/Videos/Buster Keaton - Der Navigator.mp4"))
     .WithMapGet("/requests/icon", async context => 
         {
-            
             var qs = context.Request.Query;
             var test = qs["path"].ToString();
             using var imageFile = File.OpenRead(Path.Combine(System.Environment.CurrentDirectory, "webroot", "Bild188.JPG"));
-            var mime = imageFile.Name.GetMimeType();
-            //TODO Extension function to serve a file
-            bool isModified = context.CheckIsModified(startTime);
-            // TODO 304 or serve
-            context.Response.Headers.ContentType = mime;
-            context.Response.Headers.LastModified = startTime.ToUnixTimestring();
-            await imageFile.CopyToAsync(context.Response.Body, 8192);
+            await context.SendStream(imageFile, startTime, imageFile.Name);
         })
     .WithMapGet("/json/{name:alpha}", async context =>
         {
@@ -90,4 +83,3 @@ record Event(string Content);
 record Cmd1Param(string Text, int Id);
 record Cmd1Result(string Result, int Id);
 
-// TODO GetMimeType

@@ -103,20 +103,37 @@ public static class Extensions
     public static string ToUnixTimestring(this DateTime localTime)
         => localTime.ToUniversalTime().ToString("r");
 
-    public static bool CheckIsModified(this HttpContext context, DateTime lastWriteTime)
-    => (from n in context
-                    .Request
-                    .Headers
-                    .IfModifiedSince
-                    .ToString()
-                    .SubstringUntil(';')
-                    .WhiteSpaceToNull()
-                    ?.FromString()
-                    .ToRef()
-        let r = lastWriteTime.TruncateMilliseconds() > n
-        select r.ToRef())
-            .GetOrDefault(true);
+    public static bool CheckIsModified(this HttpContext context, DateTime? lastWriteTime)
+    => lastWriteTime.HasValue
+        ? (from n in context
+                        .Request
+                        .Headers
+                        .IfModifiedSince
+                        .ToString()
+                        .SubstringUntil(';')
+                        .WhiteSpaceToNull()
+                        ?.FromString()
+                        .ToRef()
+           let r = lastWriteTime.Value.TruncateMilliseconds() > n
+           select r.ToRef())
+                .GetOrDefault(true)
+        : true;
 
+    public static async Task SendStream(this HttpContext context, Stream stream, DateTime? lastWriteTime, string? fileName = null)
+    {
+        var mime = fileName?.GetMimeType();
+        bool isModified = context.CheckIsModified(lastWriteTime);
+        if (isModified)
+        {
+            context.Response.Headers.ContentType = mime;
+            if (lastWriteTime.HasValue)
+            context.Response.Headers.LastModified = lastWriteTime.Value.ToUnixTimestring();
+            await stream.CopyToAsync(context.Response.Body, 8192);
+        }
+        else
+            context.Response.StatusCode = 304;
+    }
+    
     public static DateTime FromString(this string timeString)
         => Convert.ToDateTime(timeString);
 
