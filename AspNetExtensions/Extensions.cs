@@ -1,8 +1,3 @@
-using Microsoft.AspNetCore.Cors.Infrastructure;
-
-using static Giraffe.Streaming.StreamingExtensions;
-using LinqTools;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +5,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+
+using CsTools.Extensions;
+using LinqTools;
+
+using static Giraffe.Streaming.StreamingExtensions;
+
 
 namespace AspNetExtensions;
 
@@ -97,6 +99,29 @@ public static class Extensions
         => new FileExtensionContentTypeProvider().TryGetContentType(file, out var contentType)
             ? contentType
             : "application/octet-stream";
+
+    public static string ToUnixTimestring(this DateTime localTime)
+        => localTime.ToUniversalTime().ToString("r");
+
+    public static bool CheckIsModified(this HttpContext context, DateTime lastWriteTime)
+    => (from n in context
+                    .Request
+                    .Headers
+                    .IfModifiedSince
+                    .ToString()
+                    .SubstringUntil(';')
+                    .WhiteSpaceToNull()
+                    ?.FromString()
+                    .ToRef()
+        let r = lastWriteTime.TruncateMilliseconds() > n
+        select r.ToRef())
+            .GetOrDefault(true);
+
+    public static DateTime FromString(this string timeString)
+        => Convert.ToDateTime(timeString);
+
+    public static DateTime TruncateMilliseconds(this DateTime dt)
+        =>  dt.AddTicks( - (dt.Ticks % TimeSpan.TicksPerSecond));        
 
     public static WebApplication With(this WebApplication webApp, IEnumerable<Func<WebApplication, WebApplication>> handlers)
     {

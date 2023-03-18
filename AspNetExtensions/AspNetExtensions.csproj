@@ -4,9 +4,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.1.0</Version>
-    <FileVersion>1.1.0.0</FileVersion>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <Version>1.2.0</Version>
+    <FileVersion>1.2.0.0</FileVersion>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
     <Authors>Uwe Riegel</Authors>
     <Company>Uwe Riegel</Company>		
     <Description>Tools for Asp.NET, mostly functional extensions, SSE, Range (via Giraffe)</Description>
@@ -38,8 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsTools" Version="2.0.0" />
     <PackageReference Include="giraffe" Version="6.0.0" />
-    <PackageReference Include="LinqTools" Version="1.1.0" />
+    <PackageReference Include="LinqTools" Version="1.2.0" />
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 

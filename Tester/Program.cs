@@ -2,6 +2,8 @@
 using LinqTools;
 using static AspNetExtensions.Core;
 
+var startTime = DateTime.Now;
+
 var sseEventSource = SseEventSource<Event>.Create();
 StartEvents(sseEventSource.Send);
 
@@ -44,11 +46,11 @@ WebApplication
             var test = qs["path"].ToString();
             using var imageFile = File.OpenRead(Path.Combine(System.Environment.CurrentDirectory, "webroot", "Bild188.JPG"));
             var mime = imageFile.Name.GetMimeType();
-            // TODO Extension functions to/from convert DateTime to headerstring
-            // TODO LastModified/IfModifed
             //TODO Extension function to serve a file
+            bool isModified = context.CheckIsModified(startTime);
+            // TODO 304 or serve
             context.Response.Headers.ContentType = mime;
-            context.Response.Headers.LastModified 
+            context.Response.Headers.LastModified = startTime.ToUnixTimestring();
             await imageFile.CopyToAsync(context.Response.Body, 8192);
         })
     .WithMapGet("/json/{name:alpha}", async context =>
