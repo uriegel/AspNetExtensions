@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace AspNetExtensions;
 
@@ -91,6 +92,11 @@ public static class Extensions
             var param = await context.Request.ReadFromJsonAsync<T>();
             await context.Response.WriteAsJsonAsync<TResult>(await onJson(param!));
         });
+
+    public static string GetMimeType(this string file)
+        => new FileExtensionContentTypeProvider().TryGetContentType(file, out var contentType)
+            ? contentType
+            : "application/octet-stream";
 
     public static WebApplication With(this WebApplication webApp, IEnumerable<Func<WebApplication, WebApplication>> handlers)
     {

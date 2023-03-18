@@ -37,6 +37,20 @@ WebApplication
             return context.Response.WriteAsync(VideoPage.Value);
         })
     .WithMapGet("/video", context => context.StreamRangeFile("/home/uwe/Videos/Buster Keaton - Der Navigator.mp4"))
+    .WithMapGet("/requests/icon", async context => 
+        {
+            
+            var qs = context.Request.Query;
+            var test = qs["path"].ToString();
+            using var imageFile = File.OpenRead(Path.Combine(System.Environment.CurrentDirectory, "webroot", "Bild188.JPG"));
+            var mime = imageFile.Name.GetMimeType();
+            // TODO Extension functions to/from convert DateTime to headerstring
+            // TODO LastModified/IfModifed
+            //TODO Extension function to serve a file
+            context.Response.Headers.ContentType = mime;
+            context.Response.Headers.LastModified 
+            await imageFile.CopyToAsync(context.Response.Body, 8192);
+        })
     .WithMapGet("/json/{name:alpha}", async context =>
         {
             var name = context.Request.RouteValues["name"];
@@ -75,16 +89,3 @@ record Cmd1Param(string Text, int Id);
 record Cmd1Result(string Result, int Id);
 
 // TODO GetMimeType
-// string GetMimeTypeForFileExtension(string filePath)
-// {
-//     const string DefaultContentType = "application/octet-stream";
-
-//     var provider = new FileExtensionContentTypeProvider();
-
-//     if (!provider.TryGetContentType(filePath, out var contentType))
-//     {
-//         contentType = DefaultContentType;
-//     }
-
-//     return contentType;
-// }
