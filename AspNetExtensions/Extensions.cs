@@ -80,7 +80,9 @@ public static class Extensions
         => webApp.WithMapGet(path, context => new Sse<TEvent>(onNext).Start(context));
 
     public static async Task StreamRangeFile(this HttpContext context, string filePath)
-        => await context.WriteFileStreamAsync(true, filePath, Microsoft.FSharp.Core.FSharpOption<Microsoft.Net.Http.Headers.EntityTagHeaderValue>.None,
+        => await context
+            .SideEffect(n => n.Response.ContentType = filePath.GetMimeType())
+            .WriteFileStreamAsync(true, filePath, Microsoft.FSharp.Core.FSharpOption<Microsoft.Net.Http.Headers.EntityTagHeaderValue>.None,
         Microsoft.FSharp.Core.FSharpOption<DateTimeOffset>.None);
 
     public static IServiceCollection When(this IServiceCollection services, bool when, Func<IServiceCollection, IServiceCollection> handler)
