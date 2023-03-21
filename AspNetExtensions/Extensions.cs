@@ -79,11 +79,11 @@ public static class Extensions
     public static WebApplication WithSse<TEvent>(this WebApplication webApp, string path, IObservable<TEvent> onNext)
         => webApp.WithMapGet(path, context => new Sse<TEvent>(onNext).Start(context));
 
-    public static async Task StreamRangeFile(this HttpContext context, string filePath)
-        => await context
+    public static Task StreamRangeFile(this HttpContext context, string filePath)
+        => context
             .SideEffect(n => n.Response.ContentType = filePath.GetMimeType())
             .WriteFileStreamAsync(true, filePath, Microsoft.FSharp.Core.FSharpOption<Microsoft.Net.Http.Headers.EntityTagHeaderValue>.None,
-        Microsoft.FSharp.Core.FSharpOption<DateTimeOffset>.None);
+                Microsoft.FSharp.Core.FSharpOption<DateTimeOffset>.None);
 
     public static IServiceCollection When(this IServiceCollection services, bool when, Func<IServiceCollection, IServiceCollection> handler)
         => when

@@ -4,9 +4,9 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.1.3</Version>
-    <FileVersion>1.1.3.0</FileVersion>
-    <AssemblyVersion>1.1.3.0</AssemblyVersion>
+    <Version>1.1.4</Version>
+    <FileVersion>1.1.4.0</FileVersion>
+    <AssemblyVersion>1.1.4.0</AssemblyVersion>
     <Authors>Uwe Riegel</Authors>
     <Company>Uwe Riegel</Company>		
     <Description>Tools for Asp.NET, mostly functional extensions, SSE, Range (via Giraffe)</Description>
