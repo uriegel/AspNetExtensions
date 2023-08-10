@@ -9,10 +9,8 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 
 using CsTools.Extensions;
 using LinqTools;
-using LinqTools.Nullable;
 
 using static Giraffe.Streaming.StreamingExtensions;
-
 
 namespace AspNetExtensions;
 
@@ -115,10 +113,11 @@ public static class Extensions
                         .ToString()
                         .SubstringUntil(';')
                         .WhiteSpaceToNull()
-                        ?.FromString()
-                        .ToRef()
+                        .FromNullable()
+                        .Select(FromString)
+                        .SelectMany(OptionExtensions.FromNullable)
            let r = lastWriteTime.Value.TruncateMilliseconds() > n
-           select r.ToRef())
+           select r)
                 .GetOrDefault(true)
         : true;
 
@@ -136,7 +135,7 @@ public static class Extensions
         else
             context.Response.StatusCode = 304;
     }
-    
+
     public static DateTime FromString(this string timeString)
         => Convert.ToDateTime(timeString);
 
