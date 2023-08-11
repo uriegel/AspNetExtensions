@@ -39,8 +39,8 @@ public static class Extensions
     public static WebApplication WithRouting(this WebApplication app)
         => app.SideEffect(a => a.UseRouting());
 
-    public static WebApplication WithEndpoints(this WebApplication app, Action<IEndpointRouteBuilder> configure)
-        => app.SideEffect(a => a.UseEndpoints(configure));
+    public static WebApplicationWithHost WithHost(this WebApplication app, string host)
+        => new WebApplicationWithHost(app, host);
 
     public static WebApplication WithStaticFiles(this WebApplication app, string requestUrl, string path)
         => app.SideEffect(a => a.UseStaticFiles(new StaticFileOptions

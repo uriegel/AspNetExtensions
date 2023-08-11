@@ -11,7 +11,7 @@ WebApplication
     .CreateBuilder(args)
     .ConfigureWebHost(webHostBuilder =>
         webHostBuilder
-            .ConfigureKestrel(options => options.ListenAnyIP(19999))
+            .ConfigureKestrel(options => options.ListenAnyIP(2000))
             .ConfigureServices(services =>
                 services
                     .When(true, s => s.AddCors())
@@ -23,16 +23,17 @@ WebApplication
                     .AddDebug()))
     .Build()
     .WithResponseCompression()
-    // .With(async (context, next) =>
-    // {
-    //     if (context.Request.Path == "/")
-    //     {
-    //         await context.Response.WriteAsync("Terminal Middleware.");
-    //         return;
-    //     }
-    //     await next(context);
-    // })
-    .WithMapGet("/test", () => "Das ist der Test")
+    .WithHost("illmatic")
+        .WithMapGet("/test1i", () => "Test 1 illmatic")
+        .WithMapGet("/test2i", () => "Test 2 illmatic")
+        .GetApp()
+    .WithHost("localhost")
+        .WithMapGet("/test1l", () => "Test 1 localhost")
+        .WithMapGet("/test2l", () => "Test 2 localhost")
+        .GetApp()
+
+    .WithMapGet("/test1", () => "Test 1")
+    .WithMapGet("/test2", () => "Test 2")
     .WithMapGet("/cinema", context =>
         {
             context.Response.Headers.ContentType = "text/html";
@@ -59,7 +60,7 @@ WebApplication
             .AllowAnyMethod()))
     .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest1)
     .WithRouting()
-    .WithFileServer("", "webroot")
+    .WithFileServer("/web", "webroot")
     .Run();
 
 Task<Cmd1Result> JsonRequest1(Cmd1Param param)
