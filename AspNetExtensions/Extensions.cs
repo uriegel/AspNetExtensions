@@ -121,6 +121,12 @@ public static class Extensions
                 .GetOrDefault(true)
         : true;
 
+    public static Task NotFound(HttpContext context, string notFound = "Resource not found")
+        => context
+                .SideEffect(c => c.Response.StatusCode = 404)
+                .SideEffect(c => c.Response.ContentType = "text/plain; charset=utf-8")
+                .Response.WriteAsync(notFound);
+
     public static async Task SendStream(this HttpContext context, Stream stream, DateTime? lastWriteTime, string? fileName = null)
     {
         var mime = fileName?.GetMimeType();
