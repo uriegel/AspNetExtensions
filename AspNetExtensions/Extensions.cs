@@ -135,7 +135,7 @@ public static class Extensions
         {
             context.Response.Headers.ContentType = mime;
             if (lastWriteTime.HasValue)
-            context.Response.Headers.LastModified = lastWriteTime.Value.ToUnixTimestring();
+                context.Response.Headers.LastModified = lastWriteTime.Value.ToUnixTimestring();
             await stream.CopyToAsync(context.Response.Body, 8192);
         }
         else
