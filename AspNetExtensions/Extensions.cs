@@ -16,6 +16,20 @@ namespace AspNetExtensions;
 
 public static class Extensions
 {
+    public static async Task<int> ToUnitTask(this Task t)
+    {
+        await t;
+        return 0;        
+    }
+
+    public static async Task<TResult> SelectMany<T, TResult>
+            (this Task<T> task, Func<T, Task<TResult>> bind)
+    {
+        var t = await task;
+        return await bind(t);
+    }
+
+
     public static WebApplicationBuilder ConfigureWebHost(this WebApplicationBuilder appBuilder, Func<IWebHostBuilder, IWebHostBuilder> webHost)
         => appBuilder.SideEffect(n => webHost(n.WebHost));
 
@@ -30,6 +44,10 @@ public static class Extensions
 
     public static WebApplication WithMapPost(this WebApplication app, string pattern, RequestDelegate requestDelegate)
         => app.SideEffect(a => a.MapPost(pattern, requestDelegate));
+
+    public static WebApplication WithReverseProxy(this WebApplication app, string pattern, string reverseUrl)
+        => app.SideEffect(a => a.Map($"{pattern}/{{**path}}", c => ReverseProxy.Delegate(c, reverseUrl)));
+
     public static WebApplication WithResponseCompression(this WebApplication app)
         => app.SideEffect(a => a.UseResponseCompression());
 
