@@ -35,6 +35,9 @@ public class WebApplicationWithHost
             await context.Response.WriteAsJsonAsync<TResult>(await onJson(param!));
         }));
 
+    public WebApplicationWithHost WithReverseProxy(string pattern, string reverseUrl)
+        => this.SideEffect(_ => app.WithReverseProxy(pattern, reverseUrl).RequireHost(host));
+
     WebApplication app;
     string host;
 }

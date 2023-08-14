@@ -26,6 +26,7 @@ WebApplication
     .WithHost("illmatic")
         .WithMapGet("/test1i", () => "Test 1 illmatic")
         .WithMapGet("/test2i", () => "Test 2 illmatic")
+        .WithReverseProxy("", "http://fritz.box")
         .GetApp()
     .WithHost("localhost")
         .WithMapGet("/test1l", () => "Test 1 localhost")
@@ -52,7 +53,6 @@ WebApplication
             var name = context.Request.RouteValues["name"];
             await context.Response.WriteAsJsonAsync(new { Message = $"Hello {name}", Mist = (string?)null }, JsonWebDefaults);
         })
-    .WithReverseProxy("/affe", "https://vme-proxytest.ub2.cae.local")
     .WithSse("/sse/test", sseEventSource)
     .When(true, app => app.WithCors(builder =>
         builder
