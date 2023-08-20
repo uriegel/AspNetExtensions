@@ -16,11 +16,11 @@ public class Sse<TEvent>
         context.Response.Headers.ContentType = "text/event-stream";
         context.Response.Headers.CacheControl = "no-cache";
 
-        onNext.Subscribe(async n =>
-        {
-            var payload = System.Text.Json.JsonSerializer.Serialize(n, JsonWebDefaults);
-            await context.Response.WriteAsync($"data:{payload}\n\n");
-        });
+        onNext.Subscribe(n => 
+            context
+                .Response
+                .WriteAsync($"data:{System.Text.Json.JsonSerializer.Serialize(n, JsonWebDefaults)}\n\n")
+                .Wait());
 
         // Wait forever
         var tcs = new TaskCompletionSource();
