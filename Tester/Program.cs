@@ -11,7 +11,12 @@ WebApplication
     .CreateBuilder(args)
     .ConfigureWebHost(webHostBuilder =>
         webHostBuilder
-            .ConfigureKestrel(options => options.ListenAnyIP(2000))
+            .ConfigureKestrel(options => 
+                options
+                    .UseListenAnyIP(2000)
+                    .UseLimits(limits => 
+                        limits.SetMaxRequestBodySize(null))
+            )
             .ConfigureServices(services =>
                 services
                     .When(true, s => s.AddCors())

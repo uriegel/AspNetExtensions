@@ -11,6 +11,7 @@ using CsTools.Extensions;
 using LinqTools;
 
 using static Giraffe.Streaming.StreamingExtensions;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace AspNetExtensions;
 
@@ -99,6 +100,15 @@ public static class Extensions
             var param = await context.Request.ReadFromJsonAsync<T>();
             await context.Response.WriteAsJsonAsync<TResult>(await onJson(param!));
         });
+
+    public static KestrelServerOptions UseListenAnyIP(this KestrelServerOptions builder, int ip)
+        => builder.SideEffect(b => b.ListenAnyIP(ip));
+
+    public static KestrelServerOptions UseLimits(this KestrelServerOptions builder, Func<KestrelServerLimits, KestrelServerLimits> limitsBuilder)
+        => builder.SideEffect(_ => limitsBuilder(builder.Limits));
+
+    public static KestrelServerLimits SetMaxRequestBodySize(this KestrelServerLimits limits, long? size)
+        => limits.SideEffect(l => l.MaxRequestBodySize = size);
 
     public static string GetMimeType(this string file)
         => new FileExtensionContentTypeProvider().TryGetContentType(file, out var contentType)
