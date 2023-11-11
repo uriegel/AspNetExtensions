@@ -119,8 +119,8 @@ public static class Extensions
         => localTime.ToUniversalTime().ToString("r");
 
     public static bool CheckIsModified(this HttpContext context, DateTime? lastWriteTime)
-    => lastWriteTime.HasValue
-        ? (from n in context
+    => !lastWriteTime.HasValue
+        || (from n in context
                         .Request
                         .Headers
                         .IfModifiedSince
@@ -132,8 +132,7 @@ public static class Extensions
                         .SelectMany(OptionExtensions.FromNullable)
            let r = lastWriteTime.Value.TruncateMilliseconds() > n
            select r)
-                .GetOrDefault(true)
-        : true;
+                .GetOrDefault(true);
 
     public static Task NotFound(HttpContext context, string notFound = "Resource not found")
         => context
