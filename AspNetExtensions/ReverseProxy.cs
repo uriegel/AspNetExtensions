@@ -1,5 +1,5 @@
-using LinqTools;
-using LinqTools.Async;
+using CsTools.Async;
+using CsTools.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using static CsTools.Functional.Memoization;
@@ -21,7 +21,7 @@ public static class ReverseProxy
             .SendAsync(context)
             .Select(m => CopyFromTargetResponseHeaders(m, context))
             .Select(m => m.SideEffect(m => context.Response.StatusCode = (int)m.StatusCode))
-            .SelectMany(m => m.Content.CopyToAsync(context.Response.Body).ToUnitTask());
+            .SelectMany(m => m.Content.CopyToAsync(context.Response.Body).ToNothing());
 
     static Task<HttpResponseMessage> SendAsync(this HttpRequestMessage msg, HttpContext context)
         => GetClient().SendAsync(msg, HttpCompletionOption.ResponseHeadersRead, context.RequestAborted);
