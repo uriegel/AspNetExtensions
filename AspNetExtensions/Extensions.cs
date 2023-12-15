@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 
 using CsTools.Extensions;
-using LinqTools;
 
 using static Giraffe.Streaming.StreamingExtensions;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
