@@ -119,14 +119,14 @@ public static class Extensions
 
     public static bool CheckIsModified(this HttpContext context, DateTime? lastWriteTime)
         => !lastWriteTime.HasValue
-            || context
+            || (context
                 .Request
                 .Headers
                 .IfModifiedSince
                 .ToString()
                 .SubstringUntil(';')  
                 .WhiteSpaceToNull()
-                ?.FromString() <= lastWriteTime.Value.TruncateMilliseconds();
+                ?.FromString() ?? DateTime.MinValue) <= lastWriteTime.Value.TruncateMilliseconds();
 
     public static Task NotFound(HttpContext context, string notFound = "Resource not found")
         => context
