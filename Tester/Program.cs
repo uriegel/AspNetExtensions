@@ -2,6 +2,7 @@
 using CsTools.Extensions;
 using CsTools.Functional;
 using static AspNetExtensions.Core;
+using static CsTools.Core;
 
 var startTime = DateTime.Now;
 
@@ -67,8 +68,8 @@ WebApplication
             .AllowAnyHeader()
             .AllowAnyMethod()))
     .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest)
-    .WithJsonPost<Nothing, string>("requests/req1", request1)
-    .WithJsonPost<Request2, string>("requests/req2", request2)
+    .WithJsonPost<Nothing, Cmd1Result, string>("requests/req1", request1)
+    .WithJsonPost<Request2, Cmd1Result, string>("requests/req2", request2)
     .WithRouting()
     .WithFileServer("/web", "webroot")
     .Start();
@@ -133,11 +134,13 @@ WebApplication
 Task<Cmd1Result> JsonRequest(Cmd1Param? param)
     => new Cmd1Result("Result", 3).ToAsync(); 
 
-Task<string> request1() 
-    => "Hallo".ToAsync();
+AsyncResult<Cmd1Result, string> request1() 
+    => Ok<Cmd1Result, string>(new Cmd1Result("Result", 999))
+        .ToAsyncResult();
    
-Task<string> request2(Request2 payload) 
-    => "Hallo2".ToAsync();
+AsyncResult<Cmd1Result, string> request2(Request2 payload) 
+    => Ok<Cmd1Result, string>(new Cmd1Result("Result2", 999))
+        .ToAsyncResult();
 
 void StartEvents(Action<Event> onChanged)   
 {

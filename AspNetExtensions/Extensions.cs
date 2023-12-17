@@ -11,6 +11,7 @@ using CsTools.Extensions;
 
 using static Giraffe.Streaming.StreamingExtensions;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using CsTools.Functional;
 
 namespace AspNetExtensions;
 
@@ -102,6 +103,17 @@ public static class Extensions
             await context.Response.WriteAsJsonAsync(await onJson(param!));
         });
 
+    public static WebApplication WithJsonPost<T, TResult, TE>(this WebApplication webApp, string path, Func<T, AsyncResult<TResult, TE>> onJson)
+            where TResult : notnull
+            where TE : notnull
+        => webApp.WithMapPost(path, async context => 
+        {
+            if (context.Request.ContentLength == 0)
+                throw new Exception(); // TODO RESULT wrong param handling
+            var param = await context.Request.ReadFromJsonAsync<T>();
+            await context.Response.WriteAsJsonAsync(await onJson(param!).ToResult());
+        });
+
     public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<Task<TResult>> onJson)
         => webApp.WithMapPost(path, async context => 
         {
@@ -109,6 +121,18 @@ public static class Extensions
                 throw new Exception(); // TODO RESULT wrong param handling
             await context.Response.WriteAsJsonAsync(await onJson());
         });
+
+
+    public static WebApplication WithJsonPost<T, TResult, TE>(this WebApplication webApp, string path, Func<AsyncResult<TResult, TE>> onJson)
+            where TResult : notnull
+            where TE : notnull
+        => webApp.WithMapPost(path, async context => 
+        {
+            if (context.Request.ContentLength != 0)
+                throw new Exception(); // TODO RESULT wrong param handling
+            await context.Response.WriteAsJsonAsync(await onJson().ToResult());
+        });
+
 // TODO static mapping function to Error from Result
 // TODO wrong input type (json parse error)
 // TODO general error .NET exception 
