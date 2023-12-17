@@ -8,7 +8,7 @@ type Request2 = {
 	id: number
 }
 
-const makeRequest1Type = () => ({ method: "req1", payload: {} })
+const makeRequest1Type = () => ({ method: "req1"})
 
 const makeRequest2Type = (payload: Request2) => ({
     method: "req2",
@@ -17,6 +17,7 @@ const makeRequest2Type = (payload: Request2) => ({
 
 function App() {
 
+	// TODO Result as result
 	// TODO no connection
 	// TODO timeout
 	// TODO cors

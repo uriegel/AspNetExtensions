@@ -96,8 +96,18 @@ public static class Extensions
     public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<T, Task<TResult>> onJson)
         => webApp.WithMapPost(path, async context => 
         {
+            if (context.Request.ContentLength == 0)
+                throw new Exception(); // TODO RESULT wrong param handling
             var param = await context.Request.ReadFromJsonAsync<T>();
-            await context.Response.WriteAsJsonAsync<TResult>(await onJson(param!));
+            await context.Response.WriteAsJsonAsync(await onJson(param!));
+        });
+
+    public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<Task<TResult>> onJson)
+        => webApp.WithMapPost(path, async context => 
+        {
+            if (context.Request.ContentLength != 0)
+                throw new Exception(); // TODO RESULT wrong param handling
+            await context.Response.WriteAsJsonAsync(await onJson());
         });
 
     public static KestrelServerOptions UseListenAnyIP(this KestrelServerOptions builder, int ip)

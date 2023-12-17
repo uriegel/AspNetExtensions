@@ -51,7 +51,7 @@ WebApplication
         {
             var qs = context.Request.Query;
             var test = qs["path"].ToString();
-            using var imageFile = File.OpenRead(Path.Combine(System.Environment.CurrentDirectory, "webroot", "Bild188.JPG"));
+            using var imageFile = File.OpenRead(Path.Combine(Environment.CurrentDirectory, "webroot", "Bild188.JPG"));
             await context.SendStream(imageFile, startTime, imageFile.Name);
         })
     .WithMapGet("/json/{name:alpha}", async context =>
@@ -62,8 +62,8 @@ WebApplication
     .WithSse("/sse/test", sseEventSource)
     .When(true, app => app.WithCors(builder =>
         builder
-            .WithOrigins("http://localhost:3000")
             .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()))
     .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest)
@@ -130,10 +130,10 @@ WebApplication
     .SideEffect(_ => Console.WriteLine("Open http://localhost:2000/web/"))
     .Run();
 
-Task<Cmd1Result> JsonRequest(Cmd1Param param)
+Task<Cmd1Result> JsonRequest(Cmd1Param? param)
     => new Cmd1Result("Result", 3).ToAsync(); 
 
-Task<string> request1(Nothing _) 
+Task<string> request1() 
     => "Hallo".ToAsync();
    
 Task<string> request2(Request2 payload) 
