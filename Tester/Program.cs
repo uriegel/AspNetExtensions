@@ -123,6 +123,7 @@ WebApplication
     .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest1)
     .WithRouting()
     .WithFileServer("/web", "webroot")
+    .SideEffect(_ => Console.WriteLine("Open http://localhost:2000/web/"))
     .Run();
 
 Task<Cmd1Result> JsonRequest1(Cmd1Param param)
@@ -146,3 +147,7 @@ record Event(string Content);
 record Cmd1Param(string Text, int Id);
 record Cmd1Result(string Result, int Id);
 
+// TODO React web page because of typescript Result
+// TODO typescript fetch request with Result returning client side error (connection refused)
+// TODO Json-Request server side returning AsyncResult ( or Result.ToAsyncResult()), catching all Exceptions like runtime error or JSON deserialize exception
+// TODO Result must be extendable
