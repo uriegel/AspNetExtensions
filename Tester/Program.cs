@@ -1,5 +1,6 @@
 ﻿using AspNetExtensions;
 using CsTools.Extensions;
+using CsTools.Functional;
 using static AspNetExtensions.Core;
 
 var startTime = DateTime.Now;
@@ -62,9 +63,12 @@ WebApplication
     .When(true, app => app.WithCors(builder =>
         builder
             .WithOrigins("http://localhost:3000")
+            .WithOrigins("http://localhost:5173")
             .AllowAnyHeader()
             .AllowAnyMethod()))
-    .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest1)
+    .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest)
+    .WithJsonPost<Nothing, string>("requests/req1", request1)
+    .WithJsonPost<Request2, string>("requests/req2", request2)
     .WithRouting()
     .WithFileServer("/web", "webroot")
     .Start();
@@ -120,14 +124,20 @@ WebApplication
             .WithOrigins("http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()))
-    .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest1)
+    .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest)
     .WithRouting()
     .WithFileServer("/web", "webroot")
     .SideEffect(_ => Console.WriteLine("Open http://localhost:2000/web/"))
     .Run();
 
-Task<Cmd1Result> JsonRequest1(Cmd1Param param)
+Task<Cmd1Result> JsonRequest(Cmd1Param param)
     => new Cmd1Result("Result", 3).ToAsync(); 
+
+Task<string> request1(Nothing _) 
+    => "Hallo".ToAsync();
+   
+Task<string> request2(Request2 payload) 
+    => "Hallo2".ToAsync();
 
 void StartEvents(Action<Event> onChanged)   
 {
@@ -146,6 +156,9 @@ record Event(string Content);
 
 record Cmd1Param(string Text, int Id);
 record Cmd1Result(string Result, int Id);
+
+record Request2(string Name, int Id);
+
 
 // TODO typescript fetch request with Result returning client side error (connection refused)
 // TODO Json-Request server side returning AsyncResult ( or Result.ToAsyncResult()), catching all Exceptions like runtime error or JSON deserialize exception

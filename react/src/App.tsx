@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { request, setBaseUrl } from './extensions'
+
+setBaseUrl("http://localhost:2000/requests")
+
+type Request2 = {
+	name: string
+	id: number
+}
+
+const makeRequest1Type = () => ({ method: "req1", payload: {} })
+
+const makeRequest2Type = (payload: Request2) => ({
+    method: "req2",
+	payload
+})
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	// TODO no connection
+	// TODO timeout
+	// TODO cors
+
+	const onRequest = async () => {
+		const res = await request(makeRequest1Type())
+		console.log(res)
+	}
+
+	const onRequest2 = async () => {
+		const res = await request(makeRequest2Type({ name: "Uwe Riegel", id: 9865 }))
+		console.log(res)
+	}
+
+	return (
+		<div>
+			<button onClick={onRequest}>Request</button>
+			<button onClick={onRequest2}>Request 2</button>
+		</div>
+  	)
 }
 
 export default App
