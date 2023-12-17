@@ -68,8 +68,9 @@ WebApplication
             .AllowAnyHeader()
             .AllowAnyMethod()))
     .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest)
-    .WithJsonPost<Nothing, Cmd1Result, string>("requests/req1", request1)
-    .WithJsonPost<Request2, Cmd1Result, string>("requests/req2", request2)
+    .WithJsonPost<Nothing, Cmd1Result, ErrorResult>("requests/req1", request1)
+    .WithJsonPost<Request2, Cmd1Result, ErrorResult>("requests/req2", request2)
+    .WithJsonPost<Nothing, Cmd1Result, ErrorResult>("requests/req3", request3)
     .WithRouting()
     .WithFileServer("/web", "webroot")
     .Start();
@@ -134,12 +135,16 @@ WebApplication
 Task<Cmd1Result> JsonRequest(Cmd1Param? param)
     => new Cmd1Result("Result", 3).ToAsync(); 
 
-AsyncResult<Cmd1Result, string> request1() 
-    => Ok<Cmd1Result, string>(new Cmd1Result("Result", 999))
+AsyncResult<Cmd1Result, ErrorResult> request1() 
+    => Ok<Cmd1Result, ErrorResult>(new Cmd1Result("Result", 999))
         .ToAsyncResult();
    
-AsyncResult<Cmd1Result, string> request2(Request2 payload) 
-    => Ok<Cmd1Result, string>(new Cmd1Result("Result2", 999))
+AsyncResult<Cmd1Result, ErrorResult> request2(Request2 payload) 
+    => Ok<Cmd1Result, ErrorResult>(new Cmd1Result("Result2", 999))
+        .ToAsyncResult();
+
+AsyncResult<Cmd1Result, ErrorResult> request3() 
+    => Error<Cmd1Result, ErrorResult>(new ErrorResult("An error has occurred", 17))
         .ToAsyncResult();
 
 void StartEvents(Action<Event> onChanged)   
@@ -159,6 +164,7 @@ record Event(string Content);
 
 record Cmd1Param(string Text, int Id);
 record Cmd1Result(string Result, int Id);
+record ErrorResult(string Msg, int Code);
 
 record Request2(string Name, int Id);
 

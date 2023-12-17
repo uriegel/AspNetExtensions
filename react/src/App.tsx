@@ -8,17 +8,16 @@ type Request2 = {
 	id: number
 }
 
-const makeRequest1Type = () => ({ method: "req1"})
-
+const makeRequest1Type = () => ({ method: "req1" })
 const makeRequest2Type = (payload: Request2) => ({
     method: "req2",
 	payload
 })
+const makeRequest3Type = () => ({ method: "req3"})
 
 function App() {
 
-	// TODO Result as result
-	// TODO client errors with id and text
+	// TODO Returning Result from functional -extensions
 	// TODO static mapping function to Error from Result
 	// TODO no connection
 	// TODO timeout
@@ -34,10 +33,16 @@ function App() {
 		console.log(res)
 	}
 
+	const onRequest3 = async () => {
+		const res = await request(makeRequest3Type())
+		console.log(res)
+	}
+	
 	return (
 		<div>
 			<button onClick={onRequest}>Request</button>
 			<button onClick={onRequest2}>Request 2</button>
+			<button onClick={onRequest3}>Request Error</button>
 		</div>
   	)
 }
