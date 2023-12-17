@@ -109,7 +109,9 @@ public static class Extensions
                 throw new Exception(); // TODO RESULT wrong param handling
             await context.Response.WriteAsJsonAsync(await onJson());
         });
-
+// TODO static mapping function to Error from Result
+// TODO wrong input type (json parse error)
+// TODO general error .NET exception 
     public static KestrelServerOptions UseListenAnyIP(this KestrelServerOptions builder, int ip)
         => builder.SideEffect(b => b.ListenAnyIP(ip));
 

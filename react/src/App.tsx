@@ -18,6 +18,8 @@ const makeRequest2Type = (payload: Request2) => ({
 function App() {
 
 	// TODO Result as result
+	// TODO client errors with id and text
+	// TODO static mapping function to Error from Result
 	// TODO no connection
 	// TODO timeout
 	// TODO cors
