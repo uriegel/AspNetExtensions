@@ -8,6 +8,16 @@ type Request2 = {
 	id: number
 }
 
+type Result = {
+	result: string
+	id: number
+}
+
+type ErrorResult = {
+	msg: string
+	code: number
+}
+
 const makeRequest1Type = () => ({ method: "req1" })
 const makeRequest2Type = (payload: Request2) => ({
     method: "req2",
@@ -17,25 +27,24 @@ const makeRequest3Type = () => ({ method: "req3"})
 
 function App() {
 
-	// TODO Returning Result from functional -extensions
 	// TODO static mapping function to Error from Result
 	// TODO no connection
 	// TODO timeout
 	// TODO cors
 
 	const onRequest = async () => {
-		const res = await request(makeRequest1Type())
-		console.log(res)
+		const res = request<Result, ErrorResult>(makeRequest1Type())
+		console.log(await res.toResult())
 	}
 
 	const onRequest2 = async () => {
-		const res = await request(makeRequest2Type({ name: "Uwe Riegel", id: 9865 }))
-		console.log(res)
+		const res = request<Result, ErrorResult>(makeRequest2Type({ name: "Uwe Riegel", id: 9865 }))
+		console.log(await res.toResult())
 	}
 
 	const onRequest3 = async () => {
-		const res = await request(makeRequest3Type())
-		console.log(res)
+		const res = request<Result, ErrorResult>(makeRequest3Type())
+		console.log(await res.toResult())
 	}
 	
 	return (

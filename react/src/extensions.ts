@@ -1,3 +1,5 @@
+import { AsyncResult, Result } from "functional-extensions"
+
 type RequestType = {
     method: string
     payload?: any
@@ -7,7 +9,7 @@ let baseUrl = ""
 
 export const setBaseUrl = (url: string) => baseUrl = url
 
-export async function request(request: RequestType) {
+export function request<T, TE>(request: RequestType): AsyncResult<T, TE> {
  
     const msg = {
         method: 'POST',
@@ -15,6 +17,8 @@ export async function request(request: RequestType) {
         body: JSON.stringify(request.payload)
     }
 
-    const response = await fetch(`${baseUrl}/${request.method}`, msg) 
-    return await response.text()
+    return new AsyncResult<T, TE>(
+        fetch(`${baseUrl}/${request.method}`, msg)
+            .bind(b => b.text()
+            .map(txt => Result.parseJSON<T, TE>(txt)))) 
 }
