@@ -71,6 +71,7 @@ WebApplication
     .WithJsonPost<Nothing, Cmd1Result, ErrorResult>("requests/req1", request1)
     .WithJsonPost<Request2, Cmd1Result, ErrorResult>("requests/req2", request2)
     .WithJsonPost<Nothing, Cmd1Result, ErrorResult>("requests/req3", request3)
+    .WithJsonPost<Nothing, Cmd1Result, ErrorResult>("requests/req7", request7)
     .WithRouting()
     .WithFileServer("/web", "webroot")
     .Start();
@@ -147,8 +148,11 @@ AsyncResult<Cmd1Result, ErrorResult> request2(Request2 payload)
         .ToAsyncResult();
 
 AsyncResult<Cmd1Result, ErrorResult> request3() 
-    => Error<Cmd1Result, ErrorResult>(new ErrorResult("An error has occurred", 17))
+    => Error<Cmd1Result, ErrorResult>(new ErrorResult("An error has occurred", 17, 44, "error"))
         .ToAsyncResult();
+
+AsyncResult<Cmd1Result, ErrorResult> request7()
+    => throw new DivideByZeroException();
 
 void StartEvents(Action<Event> onChanged)   
 {
@@ -167,9 +171,12 @@ record Event(string Content);
 
 record Cmd1Param(string Text, int Id);
 record Cmd1Result(string Result, int Id);
-record ErrorResult(string Msg, int Code);
+record ErrorResult(
+    string Msg, 
+    int Code, 
+    int Status, 
+    string StatusText) 
+    : RequestError(Status, StatusText);
 
 record Request2(string Name, int Id);
 
-
-// TODO Result must be extendable

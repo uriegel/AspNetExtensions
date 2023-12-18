@@ -1,14 +1,7 @@
 import './App.css'
-import { ErrorType, request, setBaseUrl, setMapFetchError } from './extensions'
+import { ErrorType, request, setBaseUrl } from './extensions'
 
 setBaseUrl("http://localhost:2000/requests")
-
-const matchError = (msg: ErrorType): ErrorResult => ({
-	code: msg.status + 1000,
-	msg: msg.text 
-})
-	
-setMapFetchError<ErrorResult>(matchError)
 
 type Request2 = {
 	name: string
@@ -20,9 +13,9 @@ type Result = {
 	id: number
 }
 
-type ErrorResult = {
-	msg: string
-	code: number
+interface ErrorResult extends ErrorType {
+	msg?: string
+	code?: number
 }
 
 const makeRequest1Type = () => ({ method: "req1" })
@@ -32,6 +25,7 @@ const makeRequest2Type = (payload: Request2) => ({
 })
 const makeRequest3Type = () => ({ method: "req3"})
 const makeRequest6Type = () => ({ method: "req6" })
+const makeRequest7Type = () => ({ method: "req7" })
 
 function App() {
 	const onRequest = async () => {
@@ -67,6 +61,11 @@ function App() {
 		console.log(await res.toResult())
 	}
 
+	const onRequest7 = async () => {
+		const res = request<Result, ErrorResult>(makeRequest7Type())
+		console.log(await res.toResult())
+	}
+
 	return (
 		<div>
 			<button onClick={onRequest}>Request</button>
@@ -75,8 +74,9 @@ function App() {
 			<button onClick={onRequest4}>No Connection</button>
 			<button onClick={onRequest5}>CORS problem</button>
 			<button onClick={onRequest6}>Wrong method</button>
+			<button onClick={onRequest7}>Server exception</button>
 		</div>
-  	)
+	)
 }
 
 export default App

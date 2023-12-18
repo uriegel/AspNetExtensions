@@ -2,25 +2,20 @@ import { AsyncResult, Err, Ok, Result } from "functional-extensions"
 
 type RequestType = {
     method: string
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     payload?: any
 }
 
-export type ErrorType = {
+export interface ErrorType {
     status: number
-    text: string
+    statusText: string
 }
 
 let baseUrl = ""
 
-let mapFetchError: <TE>(err: ErrorType) => TE
-
 export const setBaseUrl = (url: string) => baseUrl = url
 
-export function setMapFetchError<TE>(mapFunc: (err: ErrorType) => TE) {
-    mapFetchError<TE> = mapFunc
-}
-
-export function request<T, TE>(request: RequestType): AsyncResult<T, TE> {
+export function request<T, TE extends ErrorType>(request: RequestType): AsyncResult<T, TE> {
  
     const msg = {
         method: 'POST',
@@ -30,17 +25,18 @@ export function request<T, TE>(request: RequestType): AsyncResult<T, TE> {
 
     const tryFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Result<string, ErrorType>> => {
         try {
-            var response = await fetch(input, init)
+            const response = await fetch(input, init)
             return response.status == 200
                 ? new Ok<string, ErrorType>(await response.text())
                 : new Err<string, ErrorType>({
-                    status: response.status,
-                    text: response.statusText
+                    status: response.status + 1000,
+                    statusText: response.statusText
                 })
         } catch (err) {
             return new Err<string, ErrorType>({
                 status: 0,
-                text: (err as any).message
+                /* eslint-disable @typescript-eslint/no-explicit-any */
+                statusText: (err as any).message
             })
         }
     }
@@ -49,6 +45,6 @@ export function request<T, TE>(request: RequestType): AsyncResult<T, TE> {
         new AsyncResult<string, ErrorType>(tryFetch(input, init))
     
     return asyncFetch(`${baseUrl}/${request.method}`, msg)
-        .mapError(mapFetchError<TE>)
+        .mapError(e => e as TE)
         .bind(txt => Result.parseJSON<T, TE>(txt))
 }

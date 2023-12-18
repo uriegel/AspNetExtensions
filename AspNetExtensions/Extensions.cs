@@ -95,7 +95,7 @@ public static class Extensions
             : services;
 
     public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<T, Task<TResult>> onJson)
-        => webApp.WithMapPost(path, async context => 
+        => webApp.WithMapPost(path, async context =>
         {
             if (context.Request.ContentLength == 0)
                 throw new Exception(); // TODO RESULT wrong param handling
@@ -105,8 +105,8 @@ public static class Extensions
 
     public static WebApplication WithJsonPost<T, TResult, TE>(this WebApplication webApp, string path, Func<T, AsyncResult<TResult, TE>> onJson)
             where TResult : notnull
-            where TE : notnull
-        => webApp.WithMapPost(path, async context => 
+            where TE : RequestError
+        => webApp.WithMapPost(path, async context =>
         {
             if (context.Request.ContentLength == 0)
                 throw new Exception(); // TODO RESULT wrong param handling
@@ -115,7 +115,7 @@ public static class Extensions
         });
 
     public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<Task<TResult>> onJson)
-        => webApp.WithMapPost(path, async context => 
+        => webApp.WithMapPost(path, async context =>
         {
             if (context.Request.ContentLength != 0)
                 throw new Exception(); // TODO RESULT wrong param handling
@@ -125,17 +125,16 @@ public static class Extensions
 
     public static WebApplication WithJsonPost<T, TResult, TE>(this WebApplication webApp, string path, Func<AsyncResult<TResult, TE>> onJson)
             where TResult : notnull
-            where TE : notnull
-        => webApp.WithMapPost(path, async context => 
+            where TE : RequestError
+        => webApp.WithMapPost(path, async context =>
         {
             if (context.Request.ContentLength != 0)
                 throw new Exception(); // TODO RESULT wrong param handling
             await context.Response.WriteAsJsonAsync(await onJson().ToResult());
         });
 
-// TODO static mapping function to Error from Result
-// TODO wrong input type (json parse error)
-// TODO general error .NET exception 
+    // TODO wrong input type (json parse error)
+    // TODO general error .NET exception 
     public static KestrelServerOptions UseListenAnyIP(this KestrelServerOptions builder, int ip)
         => builder.SideEffect(b => b.ListenAnyIP(ip));
 
@@ -160,7 +159,7 @@ public static class Extensions
                 .Headers
                 .IfModifiedSince
                 .ToString()
-                .SubstringUntil(';')  
+                .SubstringUntil(';')
                 .WhiteSpaceToNull()
                 ?.FromString() ?? DateTime.MinValue) <= lastWriteTime.Value.TruncateMilliseconds();
 
@@ -189,7 +188,7 @@ public static class Extensions
         => Convert.ToDateTime(timeString);
 
     public static DateTime TruncateMilliseconds(this DateTime dt)
-        =>  dt.AddTicks( - (dt.Ticks % TimeSpan.TicksPerSecond));        
+        => dt.AddTicks(-(dt.Ticks % TimeSpan.TicksPerSecond));
 
     public static WebApplication With(this WebApplication webApp, IEnumerable<Func<WebApplication, WebApplication>> handlers)
     {
