@@ -1,4 +1,4 @@
-import { AsyncResult, Result } from "functional-extensions"
+import { AsyncResult, Err, Ok, Result } from "functional-extensions"
 
 type RequestType = {
     method: string
@@ -7,7 +7,13 @@ type RequestType = {
 
 let baseUrl = ""
 
+let mapFetchError: <TE>(err: string) => TE
+
 export const setBaseUrl = (url: string) => baseUrl = url
+
+export function setMapFetchError<TE>(mapFunc: (err: string) => TE) {
+    mapFetchError<TE> = mapFunc
+}
 
 export function request<T, TE>(request: RequestType): AsyncResult<T, TE> {
  
@@ -17,8 +23,19 @@ export function request<T, TE>(request: RequestType): AsyncResult<T, TE> {
         body: JSON.stringify(request.payload)
     }
 
-    return new AsyncResult<T, TE>(
-        fetch(`${baseUrl}/${request.method}`, msg)
-            .bind(b => b.text()
-            .map(txt => Result.parseJSON<T, TE>(txt)))) 
+    const tryFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Result<Response, string>> => {
+        try {
+            return new Ok<Response, string>(await fetch(input, init))
+        } catch (err) {
+            return new Err<Response, string>("Ging in die Hose")
+        }
+    }
+
+    const asyncFetch = (input: RequestInfo | URL, init?: RequestInit): AsyncResult<Response, string> => 
+        new AsyncResult<Response, string>(tryFetch(input, init))
+    
+    return asyncFetch(`${baseUrl}/${request.method}`, msg)
+        .mapAsync(b => b.text())
+        .mapError(mapFetchError<TE>)
+        .bind(txt => Result.parseJSON<T, TE>(txt))
 }

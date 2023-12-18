@@ -1,7 +1,11 @@
 import './App.css'
-import { request, setBaseUrl } from './extensions'
+import { request, setBaseUrl, setMapFetchError } from './extensions'
 
 setBaseUrl("http://localhost:2000/requests")
+
+const matchError = (s: string) => s
+
+setMapFetchError<string>(matchError)
 
 type Request2 = {
 	name: string
@@ -31,6 +35,7 @@ function App() {
 	// TODO no connection
 	// TODO timeout
 	// TODO cors
+	// TODO wrong method/path
 
 	const onRequest = async () => {
 		const res = request<Result, ErrorResult>(makeRequest1Type())
@@ -47,11 +52,19 @@ function App() {
 		console.log(await res.toResult())
 	}
 	
+	const onRequest4 = async () => {
+		setBaseUrl("http://localhost:2001/requests")
+		const res = request<Result, ErrorResult>(makeRequest1Type())
+		console.log(await res.toResult())
+		setBaseUrl("http://localhost:2000/requests")
+	}
+
 	return (
 		<div>
 			<button onClick={onRequest}>Request</button>
 			<button onClick={onRequest2}>Request 2</button>
 			<button onClick={onRequest3}>Request Error</button>
+			<button onClick={onRequest4}>No Connection</button>
 		</div>
   	)
 }
