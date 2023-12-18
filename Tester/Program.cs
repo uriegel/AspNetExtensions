@@ -172,6 +172,4 @@ record ErrorResult(string Msg, int Code);
 record Request2(string Name, int Id);
 
 
-// TODO typescript fetch request with Result returning client side error (connection refused)
-// TODO Json-Request server side returning AsyncResult ( or Result.ToAsyncResult()), catching all Exceptions like runtime error or JSON deserialize exception
 // TODO Result must be extendable

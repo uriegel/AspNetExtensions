@@ -5,13 +5,18 @@ type RequestType = {
     payload?: any
 }
 
+export type ErrorType = {
+    status: number
+    text: string
+}
+
 let baseUrl = ""
 
-let mapFetchError: <TE>(err: string) => TE
+let mapFetchError: <TE>(err: ErrorType) => TE
 
 export const setBaseUrl = (url: string) => baseUrl = url
 
-export function setMapFetchError<TE>(mapFunc: (err: string) => TE) {
+export function setMapFetchError<TE>(mapFunc: (err: ErrorType) => TE) {
     mapFetchError<TE> = mapFunc
 }
 
@@ -23,19 +28,27 @@ export function request<T, TE>(request: RequestType): AsyncResult<T, TE> {
         body: JSON.stringify(request.payload)
     }
 
-    const tryFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Result<Response, string>> => {
+    const tryFetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Result<string, ErrorType>> => {
         try {
-            return new Ok<Response, string>(await fetch(input, init))
+            var response = await fetch(input, init)
+            return response.status == 200
+                ? new Ok<string, ErrorType>(await response.text())
+                : new Err<string, ErrorType>({
+                    status: response.status,
+                    text: response.statusText
+                })
         } catch (err) {
-            return new Err<Response, string>((err as any).message)
+            return new Err<string, ErrorType>({
+                status: 0,
+                text: (err as any).message
+            })
         }
     }
 
-    const asyncFetch = (input: RequestInfo | URL, init?: RequestInit): AsyncResult<Response, string> => 
-        new AsyncResult<Response, string>(tryFetch(input, init))
+    const asyncFetch = (input: RequestInfo | URL, init?: RequestInit): AsyncResult<string, ErrorType> => 
+        new AsyncResult<string, ErrorType>(tryFetch(input, init))
     
     return asyncFetch(`${baseUrl}/${request.method}`, msg)
-        .mapAsync(b => b.text())
         .mapError(mapFetchError<TE>)
         .bind(txt => Result.parseJSON<T, TE>(txt))
 }

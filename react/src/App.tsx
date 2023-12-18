@@ -1,11 +1,11 @@
 import './App.css'
-import { request, setBaseUrl, setMapFetchError } from './extensions'
+import { ErrorType, request, setBaseUrl, setMapFetchError } from './extensions'
 
 setBaseUrl("http://localhost:2000/requests")
 
-const matchError = (msg: string): ErrorResult => ({
-	code: 999,
-	msg 
+const matchError = (msg: ErrorType): ErrorResult => ({
+	code: msg.status + 1000,
+	msg: msg.text 
 })
 	
 setMapFetchError<ErrorResult>(matchError)
@@ -34,13 +34,6 @@ const makeRequest3Type = () => ({ method: "req3"})
 const makeRequest6Type = () => ({ method: "req6" })
 
 function App() {
-
-	// TODO static mapping function to Error from Result
-	// TODO no connection
-	// TODO timeout
-	// TODO cors
-	// TODO wrong method/path
-
 	const onRequest = async () => {
 		const res = request<Result, ErrorResult>(makeRequest1Type())
 		console.log(await res.toResult())
