@@ -3,9 +3,12 @@ import { request, setBaseUrl, setMapFetchError } from './extensions'
 
 setBaseUrl("http://localhost:2000/requests")
 
-const matchError = (s: string) => s
-
-setMapFetchError<string>(matchError)
+const matchError = (msg: string): ErrorResult => ({
+	code: 999,
+	msg 
+})
+	
+setMapFetchError<ErrorResult>(matchError)
 
 type Request2 = {
 	name: string
@@ -28,6 +31,7 @@ const makeRequest2Type = (payload: Request2) => ({
 	payload
 })
 const makeRequest3Type = () => ({ method: "req3"})
+const makeRequest6Type = () => ({ method: "req6" })
 
 function App() {
 
@@ -59,12 +63,25 @@ function App() {
 		setBaseUrl("http://localhost:2000/requests")
 	}
 
+	const onRequest5 = async () => {
+		alert("call this site from 'http://localhost:2001'")
+		const res = request<Result, ErrorResult>(makeRequest1Type())
+		console.log(await res.toResult())
+	}
+
+	const onRequest6 = async () => {
+		const res = request<Result, ErrorResult>(makeRequest6Type())
+		console.log(await res.toResult())
+	}
+
 	return (
 		<div>
 			<button onClick={onRequest}>Request</button>
 			<button onClick={onRequest2}>Request 2</button>
 			<button onClick={onRequest3}>Request Error</button>
 			<button onClick={onRequest4}>No Connection</button>
+			<button onClick={onRequest5}>CORS problem</button>
+			<button onClick={onRequest6}>Wrong method</button>
 		</div>
   	)
 }

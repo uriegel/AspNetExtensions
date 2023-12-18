@@ -112,7 +112,7 @@ WebApplication
         {
             var qs = context.Request.Query;
             var test = qs["path"].ToString();
-            using var imageFile = File.OpenRead(Path.Combine(System.Environment.CurrentDirectory, "webroot", "Bild188.JPG"));
+            using var imageFile = File.OpenRead(Path.Combine(Environment.CurrentDirectory, "webroot", "Bild188.JPG"));
             await context.SendStream(imageFile, startTime, imageFile.Name);
         })
     .WithMapGet("/json/{name:alpha}", async context =>
@@ -127,6 +127,9 @@ WebApplication
             .AllowAnyHeader()
             .AllowAnyMethod()))
     .WithJsonPost<Cmd1Param, Cmd1Result>("json/cmd1", JsonRequest)
+    .WithHost("localhost")
+        .WithReverseProxy("", "http://localhost:5173")
+        .GetApp()
     .WithRouting()
     .WithFileServer("/web", "webroot")
     .SideEffect(_ => Console.WriteLine("Open http://localhost:2000/web/"))

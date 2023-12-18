@@ -27,7 +27,7 @@ export function request<T, TE>(request: RequestType): AsyncResult<T, TE> {
         try {
             return new Ok<Response, string>(await fetch(input, init))
         } catch (err) {
-            return new Err<Response, string>("Ging in die Hose")
+            return new Err<Response, string>((err as any).message)
         }
     }
 
