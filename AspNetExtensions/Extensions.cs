@@ -6,12 +6,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using CsTools.Functional;
 using CsTools.Extensions;
 
 using static Giraffe.Streaming.StreamingExtensions;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using CsTools.Functional;
+using static CsTools.Core;
 
 namespace AspNetExtensions;
 
@@ -98,7 +98,7 @@ public static class Extensions
         => webApp.WithMapPost(path, async context =>
         {
             if (context.Request.ContentLength == 0)
-                throw new Exception(); // TODO RESULT wrong param handling
+                throw new Exception("Wrongly called without parameters");
             var param = await context.Request.ReadFromJsonAsync<T>();
             await context.Response.WriteAsJsonAsync(await onJson(param!));
         });
@@ -108,17 +108,27 @@ public static class Extensions
             where TE : RequestError
         => webApp.WithMapPost(path, async context =>
         {
-            if (context.Request.ContentLength == 0)
-                throw new Exception(); // TODO RESULT wrong param handling
-            var param = await context.Request.ReadFromJsonAsync<T>();
-            await context.Response.WriteAsJsonAsync(await onJson(param!).ToResult());
+            try
+            {
+                if (context.Request.ContentLength == 0)
+                    await context.Response.WriteAsJsonAsync(Error<TResult, RequestError>(new RequestError(2002, "Wrongly called without parameters")));
+                else 
+                {
+                    var param = await context.Request.ReadFromJsonAsync<T>();
+                    await context.Response.WriteAsJsonAsync(await onJson(param!).ToResult());
+                }
+            }
+            catch (Exception e)
+            {
+                await context.Response.WriteAsJsonAsync(Error<TResult, RequestError>(new RequestError(2000, e.Message)));
+            }
         });
 
     public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<Task<TResult>> onJson)
         => webApp.WithMapPost(path, async context =>
         {
             if (context.Request.ContentLength != 0)
-                throw new Exception(); // TODO RESULT wrong param handling
+                throw new Exception("Wrongly called with parameters");
             await context.Response.WriteAsJsonAsync(await onJson());
         });
 
@@ -128,9 +138,17 @@ public static class Extensions
             where TE : RequestError
         => webApp.WithMapPost(path, async context =>
         {
-            if (context.Request.ContentLength != 0)
-                throw new Exception(); // TODO RESULT wrong param handling
-            await context.Response.WriteAsJsonAsync(await onJson().ToResult());
+            try
+            {
+                if (context.Request.ContentLength != 0)
+                    await context.Response.WriteAsJsonAsync(Error<TResult, RequestError>(new RequestError(2001, "Wrongly called with parameters")));
+                else
+                    await context.Response.WriteAsJsonAsync(await onJson().ToResult());
+            }
+            catch (Exception e)
+            {
+                await context.Response.WriteAsJsonAsync(Error<TResult, RequestError>(new RequestError(2000, e.Message)));
+            }
         });
 
     // TODO wrong input type (json parse error)
