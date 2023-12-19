@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "functional-extensions": "^1.1.1",
+    "functional-extensions": "^1.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

@@ -1,5 +1,5 @@
+import { ErrorType, jsonPost, setBaseUrl } from 'functional-extensions'
 import './App.css'
-import { ErrorType, request, setBaseUrl } from './extensions'
 
 setBaseUrl("http://localhost:2000/requests")
 
@@ -29,40 +29,40 @@ const makeRequest7Type = () => ({ method: "req7" })
 
 function App() {
 	const onRequest = async () => {
-		const res = request<Result, ErrorResult>(makeRequest1Type())
+		const res = jsonPost<Result, ErrorResult>(makeRequest1Type())
 		console.log(await res.toResult())
 	}
 
 	const onRequest2 = async () => {
-		const res = request<Result, ErrorResult>(makeRequest2Type({ name: "Uwe Riegel", id: 9865 }))
+		const res = jsonPost<Result, ErrorResult>(makeRequest2Type({ name: "Uwe Riegel", id: 9865 }))
 		console.log(await res.toResult())
 	}
 
 	const onRequest3 = async () => {
-		const res = request<Result, ErrorResult>(makeRequest3Type())
+		const res = jsonPost<Result, ErrorResult>(makeRequest3Type())
 		console.log(await res.toResult())
 	}
 	
 	const onRequest4 = async () => {
 		setBaseUrl("http://localhost:2001/requests")
-		const res = request<Result, ErrorResult>(makeRequest1Type())
+		const res = jsonPost<Result, ErrorResult>(makeRequest1Type())
 		console.log(await res.toResult())
 		setBaseUrl("http://localhost:2000/requests")
 	}
 
 	const onRequest5 = async () => {
 		alert("call this site from 'http://localhost:2001'")
-		const res = request<Result, ErrorResult>(makeRequest1Type())
+		const res = jsonPost<Result, ErrorResult>(makeRequest1Type())
 		console.log(await res.toResult())
 	}
 
 	const onRequest6 = async () => {
-		const res = request<Result, ErrorResult>(makeRequest6Type())
+		const res = jsonPost<Result, ErrorResult>(makeRequest6Type())
 		console.log(await res.toResult())
 	}
 
 	const onRequest7 = async () => {
-		const res = request<Result, ErrorResult>(makeRequest7Type())
+		const res = jsonPost<Result, ErrorResult>(makeRequest7Type())
 		console.log(await res.toResult())
 	}
 
