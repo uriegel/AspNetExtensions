@@ -1,4 +1,4 @@
-import { ErrorType, jsonPost, setBaseUrl } from 'functional-extensions'
+import { ErrorType, Nothing, jsonPost, setBaseUrl } from 'functional-extensions'
 import './App.css'
 
 setBaseUrl("http://localhost:2000/requests")
@@ -26,45 +26,47 @@ const makeRequest2Type = (payload: Request2) => ({
 const makeRequest3Type = () => ({ method: "req3"})
 const makeRequest6Type = () => ({ method: "req6" })
 const makeRequest7Type = () => ({ method: "req7" })
+const makeRequest8Type = () => ({ method: "req8" })
 
 function App() {
-	const onRequest = async () => {
-		const res = jsonPost<Result, ErrorResult>(makeRequest1Type())
-		console.log(await res.toResult())
-	}
+	const onRequest = () => 
+		jsonPost<Result, ErrorResult>(makeRequest1Type())
+		.match(console.log, console.log)
 
-	const onRequest2 = async () => {
-		const res = jsonPost<Result, ErrorResult>(makeRequest2Type({ name: "Uwe Riegel", id: 9865 }))
-		console.log(await res.toResult())
-	}
-
-	const onRequest3 = async () => {
-		const res = jsonPost<Result, ErrorResult>(makeRequest3Type())
-		console.log(await res.toResult())
-	}
+	const onRequest2 = () => 
+		jsonPost<Result, ErrorResult>(makeRequest2Type({ name: "Uwe Riegel", id: 9865 }))
+		.match(console.log, console.log)
 	
-	const onRequest4 = async () => {
+
+	const onRequest3 = () => 
+		jsonPost<Result, ErrorResult>(makeRequest3Type())
+		.match(console.log, console.log)
+	
+	const onRequest4 = () => {
 		setBaseUrl("http://localhost:2001/requests")
-		const res = jsonPost<Result, ErrorResult>(makeRequest1Type())
-		console.log(await res.toResult())
+		jsonPost<Result, ErrorResult>(makeRequest1Type())
+		.match(console.log, console.log)
 		setBaseUrl("http://localhost:2000/requests")
 	}
 
-	const onRequest5 = async () => {
+	const onRequest5 = () => {
 		alert("call this site from 'http://localhost:2001'")
-		const res = jsonPost<Result, ErrorResult>(makeRequest1Type())
-		console.log(await res.toResult())
+		jsonPost<Result, ErrorResult>(makeRequest1Type())
+		.match(console.log, console.log)
 	}
 
-	const onRequest6 = async () => {
-		const res = jsonPost<Result, ErrorResult>(makeRequest6Type())
-		console.log(await res.toResult())
-	}
+	const onRequest6 = () => 
+		jsonPost<Result, ErrorResult>(makeRequest6Type())
+		.match(console.log, console.log)
+	
 
-	const onRequest7 = async () => {
-		const res = jsonPost<Result, ErrorResult>(makeRequest7Type())
-		console.log(await res.toResult())
-	}
+	const onRequest7 = () => 
+		jsonPost<Result, ErrorResult>(makeRequest7Type())
+		.match(console.log, console.log)	
+	
+	const onRequest8 = () => 
+		jsonPost<Nothing, ErrorResult>(makeRequest8Type())
+		.match(() => console.log("nothing OK"), e => console.log("nothing Error", e))
 
 	return (
 		<div>
@@ -75,6 +77,7 @@ function App() {
 			<button onClick={onRequest5}>CORS problem</button>
 			<button onClick={onRequest6}>Wrong method</button>
 			<button onClick={onRequest7}>Server exception</button>
+			<button onClick={onRequest8}>Result nothing</button>
 		</div>
 	)
 }

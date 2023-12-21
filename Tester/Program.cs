@@ -72,6 +72,7 @@ WebApplication
     .WithJsonPost<Request2, Cmd1Result, ErrorResult>("requests/req2", request2)
     .WithJsonPost<Nothing, Cmd1Result, ErrorResult>("requests/req3", request3)
     .WithJsonPost<Nothing, Cmd1Result, ErrorResult>("requests/req7", request7)
+    .WithJsonPost<Nothing, Nothing, ErrorResult>("requests/req8", request8)
     .WithRouting()
     .WithFileServer("/web", "webroot")
     .Start();
@@ -153,6 +154,10 @@ AsyncResult<Cmd1Result, ErrorResult> request3()
 
 AsyncResult<Cmd1Result, ErrorResult> request7()
     => throw new DivideByZeroException();
+
+AsyncResult<Nothing, ErrorResult> request8()
+    => Ok<Nothing, ErrorResult>(nothing)
+        .ToAsyncResult();
 
 void StartEvents(Action<Event> onChanged)   
 {
