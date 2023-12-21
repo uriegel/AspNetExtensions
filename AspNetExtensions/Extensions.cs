@@ -151,8 +151,6 @@ public static class Extensions
             }
         });
 
-    // TODO wrong input type (json parse error)
-    // TODO general error .NET exception 
     public static KestrelServerOptions UseListenAnyIP(this KestrelServerOptions builder, int ip)
         => builder.SideEffect(b => b.ListenAnyIP(ip));
 
