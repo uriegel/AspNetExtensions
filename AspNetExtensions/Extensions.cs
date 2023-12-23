@@ -133,7 +133,7 @@ public static class Extensions
         });
 
 
-    public static WebApplication WithJsonPost<T, TResult, TE>(this WebApplication webApp, string path, Func<AsyncResult<TResult, TE>> onJson)
+    public static WebApplication WithJsonPost<TResult, TE>(this WebApplication webApp, string path, Func<AsyncResult<TResult, TE>> onJson)
             where TResult : notnull
             where TE : RequestError
         => webApp.WithMapPost(path, async context =>
