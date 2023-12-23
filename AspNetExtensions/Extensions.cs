@@ -103,7 +103,7 @@ public static class Extensions
             await context.Response.WriteAsJsonAsync(await onJson(param!));
         });
 
-    public static WebApplication WithJsonPost<T, TResult, TE>(this WebApplication webApp, string path, Func<T, AsyncResult<TResult, TE>> onJson)
+    public static WebApplication WithJsonPost<T, TResult, TE>(this WebApplication webApp, string path, Func<T, AsyncResult<TResult, TE>> onJson, Action<Exception?>? onSend = null)
             where TResult : notnull
             where TE : RequestError
         => webApp.WithMapPost(path, async context =>
@@ -117,10 +117,12 @@ public static class Extensions
                     var param = await context.Request.ReadFromJsonAsync<T>();
                     await context.Response.WriteAsJsonAsync(await onJson(param!).ToResult());
                 }
+                onSend?.Invoke(null);
             }
             catch (Exception e)
             {
                 await context.Response.WriteAsJsonAsync(Error<TResult, RequestError>(new RequestError(2000, e.Message)));
+                onSend?.Invoke(e);
             }
         });
 
@@ -144,10 +146,12 @@ public static class Extensions
                     await context.Response.WriteAsJsonAsync(Error<TResult, RequestError>(new RequestError(2001, "Wrongly called with parameters")));
                 else
                     await context.Response.WriteAsJsonAsync(await onJson().ToResult());
+                onSend?.Invoke(null);                    
             }
             catch (Exception e)
             {
                 await context.Response.WriteAsJsonAsync(Error<TResult, RequestError>(new RequestError(2000, e.Message)));
+                onSend?.Invoke(e);
             }
         });
 
