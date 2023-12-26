@@ -28,6 +28,10 @@ const makeRequest6Type = () => ({ method: "req6" })
 const makeRequest7Type = () => ({ method: "req7" })
 const makeRequest8Type = () => ({ method: "req8" })
 
+const source = new EventSource("http://localhost:2000/sse/test")
+source.onmessage = (event) => console.log("SSE event", event.data)
+
+
 function App() {
 	const onRequest = () => 
 		jsonPost<Result, ErrorResult>(makeRequest1Type())
