@@ -1,6 +1,7 @@
 ﻿using AspNetExtensions;
 using CsTools.Extensions;
 using CsTools.Functional;
+using CsTools.HttpRequest;
 using static AspNetExtensions.Core;
 using static CsTools.Core;
 

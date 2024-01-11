@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using CsTools.Functional;
 using CsTools.Extensions;
+using CsTools.HttpRequest;
 
 using static Giraffe.Streaming.StreamingExtensions;
 using static CsTools.Core;
