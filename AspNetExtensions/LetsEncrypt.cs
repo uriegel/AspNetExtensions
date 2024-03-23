@@ -1,7 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
 using CsTools.Extensions;
 
-using static CsTools.WithLogging;
 using static CsTools.Functional.Memoization;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using CsTools;
@@ -33,11 +32,11 @@ public static class LetsEncrypt
     public static void Use(HttpsConnectionAdapterOptions options)
         => options.ServerCertificateSelector = (_, __) => Get();
 
-    static X509Certificate2? InitCertificate()
-        => GetEnvironmentVariable(LETS_ENCRYPT_DIR)
-            ?.AppendPath("certificate.pfx")
-            ?.ReadCertificate()
-            ?.SideEffect(_ => StartCertificateTimer());
+    static X509Certificate2 InitCertificate()
+        => GetEncryptDirectory()
+            .AppendPath("certificate.pfx")
+            .ReadCertificate()
+            .SideEffect(_ => StartCertificateTimer());
 
     static string InitGetPfxPassword()
         => (OperatingSystem.IsLinux()
@@ -59,9 +58,9 @@ public static class LetsEncrypt
     static readonly Func<string, string?> GetFileContent = name =>
         name == "check"
         ? "checked"
-        : GetEnvironmentVariable(LETS_ENCRYPT_DIR)
-            ?.AppendPath(name)
-            ?.ReadAllTextFromFilePath();
+        : GetEncryptDirectory()
+            .AppendPath(name)
+            .ReadAllTextFromFilePath();
 
     static void StartCertificateTimer()
         => certificateResetter ??= new(_ => Resetter.Reset(),
