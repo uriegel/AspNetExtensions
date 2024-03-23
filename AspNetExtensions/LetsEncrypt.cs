@@ -9,7 +9,7 @@ namespace AspNetExtensions;
 
 public static class LetsEncrypt
 {
-    public static WebApplicationWithHost UseValidation(this WebApplicationWithHost app)
+    public static WebApplicationWithHost UseLetsEncryptValidation(this WebApplicationWithHost app)
         => app.SideEffect(_ => app.WithMapGet("/.well-known/acme-challenge/{secret}", 
                                                 (string secret) => GetFileContent($"{secret}")));
 
