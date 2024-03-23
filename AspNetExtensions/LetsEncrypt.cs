@@ -5,7 +5,9 @@ using static CsTools.WithLogging;
 using static CsTools.Functional.Memoization;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 
-static class LetsEncrypt
+namespace AspNetExtensions;
+
+public static class LetsEncrypt
 {
     public static WebApplicationWithHost UseValidation(this WebApplicationWithHost app)
         => app.SideEffect(_ => app.WithMapGet("/.well-known/acme-challenge/{secret}", 
