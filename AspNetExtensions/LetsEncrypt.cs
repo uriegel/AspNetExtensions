@@ -4,6 +4,7 @@ using CsTools.Extensions;
 using static CsTools.WithLogging;
 using static CsTools.Functional.Memoization;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
+using CsTools;
 
 namespace AspNetExtensions;
 
@@ -13,7 +14,14 @@ public static class LetsEncrypt
         => app.SideEffect(_ => app.WithMapGet("/.well-known/acme-challenge/{secret}", 
                                                 (string secret) => GetFileContent($"{secret}")));
 
-    public const string LETS_ENCRYPT_DIR = "LETS_ENCRYPT_DIR";
+    public static Func<string> GetEncryptDirectory { get; }
+        = Memoize(InitEncryptDirectory);
+
+    static string InitEncryptDirectory()
+        => Environment
+            .GetFolderPath(Environment.SpecialFolder.ApplicationData)
+            .EnsureDirectoryExists()
+            .AppendPath("letsencrypt-uweb");
 
     /// <summary>
     /// Resetter has to be existent, otherwise MemoizeMaybe will be called with null!

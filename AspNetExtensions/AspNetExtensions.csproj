@@ -4,9 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>7.1.0</Version>
-    <FileVersion>7.1.0.0</FileVersion>
-    <AssemblyVersion>7.1.0.0</AssemblyVersion>
+    <Version>7.1.1</Version>
+    <FileVersion>7.1.1.0</FileVersion>
+    <AssemblyVersion>7.1.1.0</AssemblyVersion>
     <Authors>Uwe Riegel</Authors>
     <Company>Uwe Riegel</Company>		
     <Description>Tools for Asp.NET, mostly functional extensions, SSE, Range (via Giraffe)</Description>
