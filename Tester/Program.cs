@@ -17,8 +17,8 @@ WebApplication
             .ConfigureKestrel(options => 
                 options
                     .UseListenAnyIP(2000)
-                    .UseLimits(limits => 
-                        limits.SetMaxRequestBodySize(null))
+                    // .UseLimits(limits => 
+                    //     limits.SetMaxRequestBodySize(null))
             )
             .ConfigureServices(services =>
                 services
