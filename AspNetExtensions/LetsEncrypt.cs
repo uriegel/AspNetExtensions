@@ -19,7 +19,8 @@ public static class LetsEncrypt
     static string InitEncryptDirectory()
         => Environment
             .GetFolderPath(Environment.SpecialFolder.ApplicationData)
-            .WhiteSpaceToNull() ?? Environment.GetFolderPath(Environment.SpecialFolder.Personal).AppendPath(".config")  
+            .WhiteSpaceToNull()
+            .Pipe(s => s ?? Environment.GetFolderPath(Environment.SpecialFolder.Personal).AppendPath(".config"))
             .EnsureDirectoryExists()
             .AppendPath("letsencrypt-uweb");
 
