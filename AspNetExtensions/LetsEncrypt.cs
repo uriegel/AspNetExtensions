@@ -1,9 +1,9 @@
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
+using CsTools;
 using CsTools.Extensions;
 
 using static CsTools.Functional.Memoization;
-using Microsoft.AspNetCore.Server.Kestrel.Https;
-using CsTools;
 
 namespace AspNetExtensions;
 
@@ -19,6 +19,7 @@ public static class LetsEncrypt
     static string InitEncryptDirectory()
         => Environment
             .GetFolderPath(Environment.SpecialFolder.ApplicationData)
+            .WhiteSpaceToNull() ?? Environment.GetFolderPath(Environment.SpecialFolder.Personal).AppendPath(".config")  
             .EnsureDirectoryExists()
             .AppendPath("letsencrypt-uweb");
 
