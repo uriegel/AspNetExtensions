@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Server.Kestrel.Https;
 using CsTools;
 using CsTools.Extensions;
 
-using static CsTools.WithLogging;
 using static CsTools.Functional.Memoization;
 
 namespace AspNetExtensions;
@@ -36,7 +35,7 @@ public static class LetsEncrypt
         => options.ServerCertificateSelector = (_, __) => Get();
 
     static X509Certificate2 InitCertificate()
-        => GetEnvironmentVariable("LETS_ENCRYPT_DIR")
+        => GetEncryptDirectory()
             .AppendPath("certificate.pfx")
             .ReadCertificate()
             .SideEffect(_ => StartCertificateTimer());
@@ -73,4 +72,3 @@ public static class LetsEncrypt
         
     static Timer? certificateResetter;
 }
-
