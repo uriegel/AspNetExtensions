@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Https;
 using CsTools;
 using CsTools.Extensions;
 
+using static CsTools.WithLogging;
 using static CsTools.Functional.Memoization;
 
 namespace AspNetExtensions;
@@ -35,7 +36,7 @@ public static class LetsEncrypt
         => options.ServerCertificateSelector = (_, __) => Get();
 
     static X509Certificate2 InitCertificate()
-        => GetEncryptDirectory()
+        => GetEnvironmentVariable("LETS_ENCRYPT_DIR")
             .AppendPath("certificate.pfx")
             .ReadCertificate()
             .SideEffect(_ => StartCertificateTimer());
@@ -60,7 +61,7 @@ public static class LetsEncrypt
     static readonly Func<string, string?> GetFileContent = name =>
         name == "check"
         ? "checked"
-        : GetEncryptDirectory()
+        : GetEnvironmentVariable("LETS_ENCRYPT_DIR")
             .AppendPath(name)
             .ReadAllTextFromFilePath();
 
