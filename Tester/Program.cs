@@ -76,6 +76,7 @@ WebApplication
     .WithJsonPost("requests/req8", request8)
     .WithRouting()
     .WithFileServer("/web", "webroot")
+    .WithJsonGet("/remote/{**path}", getFiles)
     .Start();
 
 WebApplication
@@ -160,6 +161,13 @@ AsyncResult<Nothing, ErrorResult> request8()
     => Ok<Nothing, ErrorResult>(nothing)
         .ToAsyncResult();
 
+AsyncResult<RemoteItem[], RequestError> getFiles(string? path) 
+    => (path == "home/uwe"
+        ? Ok<RemoteItem[], RequestError>([new RemoteItem("einer"), new RemoteItem("zweier")])
+        : Error<RemoteItem[], RequestError>(new RequestError(404, "Datei nicht gefunden")))
+            .ToAsyncResult();
+
+
 void StartEvents(Action<Event> onChanged)   
 {
     var counter = 0;
@@ -187,3 +195,5 @@ record ErrorResult(
 
 record Request2(string Name, int Id);
 
+record RemoteItem(string Name);
+    

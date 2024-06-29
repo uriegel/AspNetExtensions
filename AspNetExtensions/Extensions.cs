@@ -95,6 +95,23 @@ public static class Extensions
             ? handler(services)
             : services;
 
+    public static WebApplication WithJsonGet<TResult>(this WebApplication webApp, string path, Func<string?, AsyncResult<TResult, RequestError>> onJson)
+        where TResult : class
+        => webApp.WithMapGet(path, async context =>
+            await onJson(context.GetRouteValue("path") as string)
+                .ToResult()
+                .MatchAsync(r => context.Response.WriteAsJsonAsync(r),
+                     e => context
+                         .StatusError(e.Status, e.StatusText)));
+
+    public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<Task<TResult>> onJson)
+        => webApp.WithMapPost(path, async context =>
+        {
+            if (context.Request.ContentLength != 0)
+                throw new Exception("Wrongly called with parameters");
+            await context.Response.WriteAsJsonAsync(await onJson());
+        });
+
     public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<T, Task<TResult>> onJson)
         => webApp.WithMapPost(path, async context =>
         {
@@ -126,15 +143,6 @@ public static class Extensions
                 onSend?.Invoke(e);
             }
         });
-
-    public static WebApplication WithJsonPost<T, TResult>(this WebApplication webApp, string path, Func<Task<TResult>> onJson)
-        => webApp.WithMapPost(path, async context =>
-        {
-            if (context.Request.ContentLength != 0)
-                throw new Exception("Wrongly called with parameters");
-            await context.Response.WriteAsJsonAsync(await onJson());
-        });
-
 
     public static WebApplication WithJsonPost<TResult, TE>(this WebApplication webApp, string path, Func<AsyncResult<TResult, TE>> onJson, Action<Exception?>? onSend = null)
             where TResult : notnull
@@ -184,11 +192,14 @@ public static class Extensions
                 .WhiteSpaceToNull()
                 ?.FromString() ?? DateTime.MinValue) <= lastWriteTime.Value.TruncateMilliseconds();
 
-    public static Task NotFound(HttpContext context, string notFound = "Resource not found")
+    public static Task NotFound(this HttpContext context, string notFound = "Resource not found")
+        => context.StatusError(404, notFound);
+
+    public static Task StatusError(this HttpContext context, int statusCode, string statusError)
         => context
-                .SideEffect(c => c.Response.StatusCode = 404)
+                .SideEffect(c => c.Response.StatusCode = statusCode)
                 .SideEffect(c => c.Response.ContentType = "text/plain; charset=utf-8")
-                .Response.WriteAsync(notFound);
+                .Response.WriteAsync(statusError);
 
     public static async Task SendStream(this HttpContext context, Stream stream, DateTime? lastWriteTime, string? fileName = null)
     {
