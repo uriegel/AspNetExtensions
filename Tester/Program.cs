@@ -167,7 +167,6 @@ AsyncResult<RemoteItem[], RequestError> getFiles(string? path)
         : Error<RemoteItem[], RequestError>(new RequestError(404, "Datei nicht gefunden")))
             .ToAsyncResult();
 
-
 void StartEvents(Action<Event> onChanged)   
 {
     var counter = 0;
