@@ -40,7 +40,6 @@ WebApplication
         .WithMapGet("/test1l", () => "Test 1 localhost")
         .WithMapGet("/test2l", () => "Test 2 localhost")
         .GetApp()
-
     .WithMapGet("/test1", () => "Test 1")
     .WithMapGet("/test2", () => "Test 2")
     .WithMapGet("/cinema", context =>
@@ -61,6 +60,7 @@ WebApplication
             var name = context.Request.RouteValues["name"];
             await context.Response.WriteAsJsonAsync(new { Message = $"Hello {name}", Mist = (string?)null }, JsonWebDefaults);
         })
+
     .WithSse("/sse/test", sseEventSource)
     .When(true, app => app.WithCors(builder =>
         builder
@@ -76,6 +76,10 @@ WebApplication
     .WithJsonPost("requests/req8", request8)
     .WithRouting()
     .WithFileServer("/web", "webroot")
+    .WithHost("pluto")
+        .WithMapGet("/testpluto3", () => "Test Pluto3")
+        .WithJsonGet("/local/{**path}", getFiles)
+        .GetApp()
     .WithJsonGet("/remote/{**path}", getFiles)
     .Start();
 
@@ -95,9 +99,9 @@ WebApplication
                     .AddDebug()))
     .Build()
     .WithResponseCompression()
-    .WithHost("illmatic")
-        .WithMapGet("/test1i", () => "Test 1 illmatic")
-        .WithMapGet("/test2i", () => "Test 2 illmatic")
+    .WithHost("pluto")
+        .WithMapGet("/test1p", () => "Test 1 pluto")
+        .WithMapGet("/test2p", () => "Test 2 pluto")
         .GetApp()
     .WithHost("localhost")
         .WithMapGet("/test1l", () => "Test 1 localhost")
