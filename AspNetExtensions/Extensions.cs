@@ -33,6 +33,12 @@ public static class Extensions
     public static WebApplication WithMapPost(this WebApplication app, string pattern, RequestDelegate requestDelegate)
         => app.SideEffect(a => a.MapPost(pattern, requestDelegate));
 
+    public static WebApplication WithMapPut(this WebApplication app, string pattern, RequestDelegate requestDelegate)
+        => app.SideEffect(a => a.MapPut(pattern, requestDelegate));
+
+    public static WebApplication WithMapDelete(this WebApplication app, string pattern, RequestDelegate requestDelegate)
+        => app.SideEffect(a => a.MapDelete(pattern, requestDelegate));
+
     public static IEndpointConventionBuilder WithReverseProxy(this WebApplication app, string pattern, string reverseUrl)
         => app.Map($"{pattern}/{{**path}}", c => ReverseProxy.Delegate(c, reverseUrl));
 
@@ -46,7 +52,7 @@ public static class Extensions
         => app.SideEffect(a => a.UseRouting());
 
     public static WebApplicationWithHost WithHost(this WebApplication app, string host)
-        => new WebApplicationWithHost(app, host);
+        => new(app, host);
 
     public static WebApplication WithStaticFiles(this WebApplication app, string requestUrl, string path)
         => app.SideEffect(a => a.UseStaticFiles(new StaticFileOptions

@@ -6,14 +6,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
-public class WebApplicationWithHost
+public class WebApplicationWithHost(WebApplication app, string host)
 {
-    public WebApplicationWithHost(WebApplication app, string host)
-    {
-        this.app = app;
-        this.host = host;
-    }
-
     public WebApplication GetApp() => app;
 
     public WebApplicationWithHost WithMapGet(string pattern, RequestDelegate requestDelegate)
@@ -34,6 +28,12 @@ public class WebApplicationWithHost
     public WebApplicationWithHost WithMapPost(string pattern, RequestDelegate requestDelegate)
         => this.SideEffect(_ => app.MapPost(pattern, requestDelegate).RequireHost(host));
 
+    public WebApplicationWithHost WithMapPut(string pattern, RequestDelegate requestDelegate)
+        => this.SideEffect(_ => app.MapPut(pattern, requestDelegate).RequireHost(host));
+
+    public WebApplicationWithHost WithMapDelete(string pattern, RequestDelegate requestDelegate)
+        => this.SideEffect(_ => app.MapDelete(pattern, requestDelegate).RequireHost(host));
+
     public WebApplicationWithHost WithSse<TEvent>(string path, SseEventSource<TEvent> sseEventSource)
         => this.SideEffect(a => a.WithMapGet(path, context => new Sse<TEvent>(sseEventSource.Subject).Start(context)));
 
@@ -50,6 +50,6 @@ public class WebApplicationWithHost
     public WebApplicationWithHost WithReverseProxy(string pattern, string reverseUrl)
         => this.SideEffect(_ => app.WithReverseProxy(pattern, reverseUrl).RequireHost(host));
 
-    WebApplication app;
-    string host;
+    readonly WebApplication app = app;
+    readonly string host = host;
 }
